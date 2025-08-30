@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Prestige Wealth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-dark: #0A0E17;
+      --primary-gold: #D4AF37;
+      --primary-blue: #14213D;
+      --accent-purple: #6A0DAD;
+      --light-bg: #F8F9FA;
+      --white: #FFFFFF;
+      --text-dark: #212529;
+      --text-light: #6C757D;
+      --success: #28a745;
+      --danger: #dc3545;
+      --sidebar-width: 250px;
+      --sidebar-collapsed: 70px;
+      --header-height: 70px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-color: #f5f7fb;
+    }
+    
+    /* Layout */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--primary-dark);
+      color: var(--white);
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      height: var(--header-height);
+    }
+    
+    .logo {
+      font-family: 'Georgia', serif;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-gold);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo i {
+      margin-right: 10px;
+      color: var(--primary-gold);
+    }
+    
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    
+    .sidebar-menu {
+      padding: 20px 0;
+    }
+    
+    .sidebar-menu ul {
+      list-style: none;
+    }
+    
+    .sidebar-menu ul li {
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-menu ul li a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    
+    .sidebar-menu ul li a:hover, 
+    .sidebar-menu ul li a.active {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--primary-gold);
+      padding-left: 25px;
+    }
+    
+    .sidebar-menu ul li a i {
+      margin-right: 10px;
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .sidebar.collapsed .menu-text,
+    .sidebar.collapsed .logo-text {
+      display: none;
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: margin-left 0.3s ease;
+    }
+    
+    .main-content.expanded {
+      margin-left: var(--sidebar-collapsed);
+    }
+    
+    /* Header */
+    .top-header {
+      background: var(--white);
+      padding: 0 20px;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--light-bg);
+      border-radius: 20px;
+      padding: 8px 15px;
+      width: 300px;
+    }
+    
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      width: 100%;
+      padding: 5px;
+    }
+    
+    .search-box i {
+      color: var(--text-light);
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+    
+    .notification {
+      position: relative;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+    
+    .notification i {
+      font-size: 1.2rem;
+      color: var(--text-light);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: var(--white);
+      font-size: 0.7rem;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .user-role {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    
+    /* Dashboard Content */
+    .dashboard-content {
+      padding: 20px;
+    }
+    
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+      color: var(--white);
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .welcome-banner h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    
+    .welcome-banner p {
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-right: 15px;
+    }
+    
+    .balance-icon {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--primary-gold);
+    }
+    
+    .investment-icon {
+      background: rgba(106, 13, 173, 0.2);
+      color: var(--accent-purple);
+    }
+    
+    .profit-icon {
+      background: rgba(40, 167, 69, 0.2);
+      color: var(--success);
+    }
+    
+    .trades-icon {
+      background: rgba(220, 53, 69, 0.2);
+      color: var(--danger);
+    }
+    
+    .stat-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    .stat-info p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .chart-container {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    .chart-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .timeframe-btn {
+      padding: 5px 10px;
+      background: var(--light-bg);
+      border: none;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    
+    .timeframe-btn.active {
+      background: var(--primary-gold);
+      color: var(--white);
+    }
+    
+    .tradingview-widget-container {
+      height: 400px;
+      width: 100%;
+    }
+    
+    .trade-form-container {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-gold);
+    }
+    
+    .trade-type {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .trade-type-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .trade-type-btn.active {
+      background: var(--success);
+      color: var(--white);
+      border-color: var(--success);
+    }
+    
+    .trade-type-btn.sell.active {
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+    
+    .btn-trade {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-trade:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    /* Positions Table */
+    .positions-container {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th, .table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .table th {
+      background: var(--light-bg);
+      font-weight: 600;
+    }
+    
+    .table tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-open {
+      background: rgba(40, 167, 69, 0.2);
+      color: var(--success);
+    }
+    
+    .status-closed {
+      background: rgba(108, 117, 125, 0.2);
+      color: var(--text-light);
+    }
+    
+    .btn-close {
+      padding: 5px 10px;
+      background: var(--danger);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    
+    /* Support Chat */
+    .support-chat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .chat-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-window {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      width: 300px;
+      height: 400px;
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .chat-window.active {
+      display: flex;
+    }
+    
+    .chat-header {
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .chat-title {
+      font-weight: 600;
+    }
+    
+    .chat-close {
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .message {
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+      font-size: 0.9rem;
+    }
+    
+    .message.support {
+      background: #f1f1f1;
+      align-self: flex-start;
+    }
+    
+    .message.user {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+      align-self: flex-end;
+    }
+    
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      outline: none;
+    }
+    
+    .chat-send {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 15px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: var(--sidebar-collapsed);
+      }
+      
+      .sidebar .menu-text,
+      .sidebar .logo-text {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: var(--sidebar-collapsed);
+      }
+      
+      .search-box {
+        width: 200px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        left: -100%;
+      }
+      
+      .sidebar.active {
+        left: 0;
+        width: var(--sidebar-width);
+      }
+      
+      .sidebar.active .menu-text,
+      .sidebar.active .logo-text {
+        display: block;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        display: none;
+      }
+      
+      .mobile-overlay.active {
+        display: block;
+      }
+      
+      .top-header {
+        padding: 0 15px;
+      }
+      
+      .search-box {
+        display: none;
+      }
+      
+      .user-info {
+        display: none;
+      }
+      
+      .dashboard-content {
+        padding: 15px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fas fa-crown"></i>
+          <span class="logo-text">Prestige Wealth</span>
+        </div>
+        <button class="toggle-btn" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <ul>
+          <li><a href="#" class="active"><i class="fas fa-home"></i> <span class="menu-text">Dashboard</span></a></li>
+          <li><a href="#"><i class="fas fa-chart-line"></i> <span class="menu-text">Trading</span></a></li>
+          <li><a href="#"><i class="fas fa-wallet"></i> <span class="menu-text">Wallet</span></a></li>
+          <li><a href="#"><i class="fas fa-history"></i> <span class="menu-text">History</span></a></li>
+          <li><a href="#"><i class="fas fa-gem"></i> <span class="menu-text">Investment Plans</span></a></li>
+          <li><a href="#"><i class="fas fa-user"></i> <span class="menu-text">Profile</span></a></li>
+          <li><a href="#"><i class="fas fa-cog"></i> <span class="menu-text">Settings</span></a></li>
+          <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span class="menu-text">Logout</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+    
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search...">
+        </div>
+        
+        <div class="user-menu">
+          <div class="notification">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </div>
+          
+          <div class="user-profile">
+            <div class="user-avatar">JD</div>
+            <div class="user-info">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Gold Investor</div>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <h1>Welcome back, John!</h1>
+          <p>Track your investments, analyze market trends, and execute trades all in one place.</p>
+          <button class="btn-trade">Start Trading</button>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon balance-icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-info">
+              <h3>$24,582.75</h3>
+              <p>Account Balance</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon investment-icon">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="stat-info">
+              <h3>$15,000.00</h3>
+              <p>Total Investment</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon profit-icon">
+              <i class="fas fa-trending-up"></i>
+            </div>
+            <div class="stat-info">
+              <h3>$2,458.75</h3>
+              <p>Total Profit</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon trades-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-info">
+              <h3>27</h3>
+              <p>Active Trades</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <!-- Chart Container -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div class="chart-title">BTC/USD Chart</div>
+              <div class="chart-controls">
+                <button class="timeframe-btn active">1H</button>
+                <button class="timeframe-btn">4H</button>
+                <button class="timeframe-btn">1D</button>
+                <button class="timeframe-btn">1W</button>
+              </div>
+            </div>
+            
+            <!-- TradingView Widget -->
+            <div class="tradingview-widget-container">
+              <div id="tradingview-chart" style="height: 100%; width: 100%">
+                <!-- Chart will be simulated with CSS -->
+                <div class="chart-simulation">
+                  <table class="charts-css line show-labels show-primary-axis show-data-axes" id="my-chart">
+                    <tbody>
+                      <tr>
+                        <td style="--start: 0.1; --size: 0.3;"> <span class="data"> $46,120 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.3; --size: 0.5;"> <span class="data"> $46,250 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.5; --size: 0.8;"> <span class="data"> $46,500 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.8; --size: 0.6;"> <span class="data"> $46,350 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.6; --size: 0.9;"> <span class="data"> $46,600 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.9; --size: 0.7;"> <span class="data"> $46,450 </span> </td>
+                      </tr>
+                      <tr>
+                        <td style="--start: 0.7; --size: 0.95;"> <span class="data"> $46,650 </span> </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Trade Form -->
+          <div class="trade-form-container">
+            <h3>Execute Trade</h3>
+            
+            <div class="trade-type">
+              <div class="trade-type-btn active" id="buyBtn">BUY</div>
+              <div class="trade-type-btn sell" id="sellBtn">SELL</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="symbol">Symbol</label>
+              <select class="form-control" id="symbol">
+                <option>BTC/USD</option>
+                <option>ETH/USD</option>
+                <option>XRP/USD</option>
+                <option>LTC/USD</option>
+                <option>ADA/USD</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="amount">Investment Amount (USD)</label>
+              <input type="number" class="form-control" id="amount" placeholder="1000">
+            </div>
+            
+            <div class="form-group">
+              <label for="leverage">Leverage</label>
+              <select class="form-control" id="leverage">
+                <option>1x</option>
+                <option>5x</option>
+                <option>10x</option>
+                <option>25x</option>
+                <option>50x</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="stopLoss">Stop Loss</label>
+              <input type="number" class="form-control" id="stopLoss" placeholder="46000">
+            </div>
+            
+            <div class="form-group">
+              <label for="takeProfit">Take Profit</label>
+              <input type="number" class="form-control" id="takeProfit" placeholder="48000">
+            </div>
+            
+            <button class="btn-trade" id="executeTrade">Execute Trade</button>
+          </div>
+        </div>
+        
+        <!-- Positions Table -->
+        <div class="positions-container">
+          <h3>Your Positions</h3>
+          
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Entry Price</th>
+                <th>Current Price</th>
+                <th>Profit/Loss</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BTC/USD</td>
+                <td>BUY</td>
+                <td>$1,000</td>
+                <td>$46,120</td>
+                <td>$46,650</td>
+                <td style="color: var(--success);">+$115.00</td>
+                <td><span class="status-badge status-open">Open</span></td>
+                <td><button class="btn-close">Close</button></td>
+              </tr>
+              <tr>
+                <td>ETH/USD</td>
+                <td>SELL</td>
+                <td>$800</td>
+                <td>$2,850</td>
+                <td>$2,820</td>
+                <td style="color: var(--success);">+$84.21</td>
+                <td><span class="status-badge status-open">Open</span></td>
+                <td><button class="btn-close">Close</button></td>
+              </tr>
+              <tr>
+                <td>XRP/USD</td>
+                <td>BUY</td>
+                <td>$500</td>
+                <td>$0.55</td>
+                <td>$0.53</td>
+                <td style="color: var(--danger);">-$18.18</td>
+                <td><span class="status-badge status-open">Open</span></td>
+                <td><button class="btn-close">Close</button></td>
+              </tr>
+              <tr>
+                <td>LTC/USD</td>
+                <td>BUY</td>
+                <td>$1,200</td>
+                <td>$68.50</td>
+                <td>$70.25</td>
+                <td style="color: var(--success);">+$30.66</td>
+                <td><span class="status-badge status-open">Open</span></td>
+                <td><button class="btn-close">Close</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Support Chat -->
+    <div class="support-chat">
+      <div class="chat-btn" id="chatBtn">
+        <i class="fas fa-headset"></i>
+      </div>
+      
+      <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+          <div class="chat-title">Customer Support</div>
+          <button class="chat-close" id="chatClose">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="chat-messages">
+          <div class="message support">
+            Hello! How can we help you today?
+          </div>
+          <div class="message user">
+            I have a question about my withdrawal.
+          </div>
+          <div class="message support">
+            Sure, I'd be happy to help. Could you please provide your account email?
+          </div>
+        </div>
+        
+        <div class="chat-input">
+          <input type="text" placeholder="Type your message...">
+          <button class="chat-send">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle Sidebar
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    
+    toggleSidebar.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('expanded');
+    });
+    
+    // Mobile sidebar toggle
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.add('active');
+      mobileOverlay.classList.add('active');
+    }
+    
+    mobileOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+    });
+    
+    // Toggle Trade Type
+    const buyBtn = document.getElementById('buyBtn');
+    const sellBtn = document.getElementById('sellBtn');
+    
+    buyBtn.addEventListener('click', () => {
+      buyBtn.classList.add('active');
+      sellBtn.classList.remove('active');
+    });
+    
+    sellBtn.addEventListener('click', () => {
+      sellBtn.classList.add('active');
+      buyBtn.classList.remove('active');
+    });
+    
+    // Toggle Timeframe Buttons
+    const timeframeBtns = document.querySelectorAll('.timeframe-btn');
+    
+    timeframeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeframeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+    
+    // Toggle Chat Window
+    const chatBtn = document.getElementById('chatBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    
+    chatBtn.addEventListener('click', () => {
+      chatWindow.classList.toggle('active');
+    });
+    
+    chatClose.addEventListener('click', () => {
+      chatWindow.classList.remove('active');
+    });
+    
+    // Execute Trade
+    const executeTradeBtn = document.getElementById('executeTrade');
+    
+    executeTradeBtn.addEventListener('click', () => {
+      const symbol = document.getElementById('symbol').value;
+      const amount = document.getElementById('amount').value;
+      const isBuy = buyBtn.classList.contains('active');
+      
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+      }
+      
+      alert(`Trade executed: ${isBuy ? 'BUY' : 'SELL'} ${amount} USD of ${symbol}`);
+      
+      // In a real application, you would send this data to your backend
+      // and update the positions table accordingly
+    });
+    
+    // Close Trade
+    const closeButtons = document.querySelectorAll('.btn-close');
+    
+    closeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const row = this.closest('tr');
+        const symbol = row.cells[0].textContent;
+        const profit = row.cells[5].textContent;
+        
+        alert(`Closed position for ${symbol}. ${profit} realized.`);
+        
+        // In a real application, you would send a request to close the position
+        // and update the UI accordingly
+        row.remove();
+      });
+    });
+    
+    // Responsive adjustments
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('collapsed');
+        mainContent.classList.remove('expanded');
+      } else {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        sidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

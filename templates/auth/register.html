@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Register for Prestige Wealth - Premium cryptocurrency investment platform">
+  <title>Register | Prestige Wealth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-dark: #0A0E17;
+      --primary-gold: #D4AF37;
+      --primary-blue: #14213D;
+      --accent-purple: #6A0DAD;
+      --light-bg: #F8F9FA;
+      --white: #FFFFFF;
+      --text-dark: #212529;
+      --text-light: #6C757D;
+      --error-color: #dc3545;
+      --success-color: #28a745;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-color: var(--light-bg);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--primary-dark);
+      position: relative;
+    }
+    
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-gold), var(--accent-purple));
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Header & Navigation */
+    header {
+      background-color: var(--primary-dark);
+      padding: 15px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-family: 'Georgia', serif;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-gold);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    
+    .logo i {
+      margin-right: 8px;
+      color: var(--primary-gold);
+    }
+    
+    /* Registration Section */
+    .registration-section {
+      padding: 150px 0 100px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    
+    .registration-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 50px;
+    }
+    
+    .registration-content {
+      flex: 1;
+      max-width: 500px;
+    }
+    
+    .registration-form-container {
+      flex: 1;
+      background: var(--white);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-title {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--primary-dark);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+    
+    .errorlist {
+      list-style: none;
+      color: var(--error-color);
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    
+    .phone-input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .phone-input-group .form-group:first-child {
+      flex: 0 0 100px;
+    }
+    
+    .phone-input-group .form-group:last-child {
+      flex: 1;
+    }
+    
+    .password-input-group {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 40px;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: color 0.3s;
+    }
+    
+    .password-toggle:hover {
+      color: var(--primary-gold);
+    }
+    
+    .password-requirements {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .password-requirements ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    
+    .password-requirements li {
+      margin-bottom: 5px;
+    }
+    
+    .form-footer {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .form-footer p {
+      margin-top: 20px;
+      color: var(--text-light);
+    }
+    
+    .form-footer a {
+      color: var(--primary-gold);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Benefits List */
+    .benefits-list {
+      list-style: none;
+      margin-top: 30px;
+    }
+    
+    .benefits-list li {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .benefit-icon {
+      color: var(--primary-gold);
+      font-size: 1.5rem;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    
+    .benefit-content h3 {
+      margin-bottom: 5px;
+      color: var(--primary-dark);
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .registration-container {
+        flex-direction: column;
+        gap: 30px;
+      }
+      
+      .registration-content, .registration-form-container {
+        max-width: 100%;
+      }
+      
+      .section-title {
+        font-size: 2.2rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .registration-section {
+        padding: 120px 0 80px;
+      }
+      
+      .registration-form-container {
+        padding: 30px;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .form-title {
+        font-size: 1.8rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .registration-form-container {
+        padding: 20px;
+      }
+      
+      .phone-input-group {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .phone-input-group .form-group:first-child {
+        flex: 1;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+      }
+      
+      .form-title {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+      
+      .benefit-icon {
+        font-size: 1.3rem;
+      }
+      
+      .benefit-content h3 {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header & Navigation -->
+  <header>
+    <div class="container header-container">
+      <a href="{% url 'hero' %}" class="logo">
+        <i class="fas fa-crown"></i>
+        Prestige Wealth
+      </a>
+    </div>
+  </header>
+  
+  <!-- Registration Section -->
+  <section class="registration-section">
+    <div class="container registration-container">
+      <div class="registration-content">
+        <h2 class="section-title">Join Prestige Wealth</h2>
+        <p>Create your account to access exclusive cryptocurrency investment opportunities with institutional-grade security and exceptional returns.</p>
+        
+        <ul class="benefits-list">
+          <li>
+            <div class="benefit-icon">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Over $15 Million Paid Out to Investors</h3>
+              <p>Join thousands of satisfied investors who are already building wealth with our proven strategies.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="benefit-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Secure Your Financial Future</h3>
+              <p>Our platform utilizes multi-layered encryption and cold storage solutions to protect your assets.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="benefit-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Premium Investment Opportunities</h3>
+              <p>Access exclusive investment strategies that generate consistent above-market returns.</p>
+            </div>
+          </li>
+          <li>
+            <div class="benefit-icon">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>VIP Treatment</h3>
+              <p>Enjoy personalized service from dedicated wealth managers and priority support.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="registration-form-container">
+        <h2 class="form-title">Create Account</h2>
+        {% for message in messages %}
+            <h4 style="color: #28a745;"> {{message}}</h4>
+        {% endfor %}
+        
+        <form method="post" action="{% url 'register' %}">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="id_username" class="form-label">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <ul class="errorlist">
+                {% for error in form.username.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="id_full_name" class="form-label">Full Name</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+              <ul class="errorlist">
+                {% for error in form.full_name.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="id_email" class="form-label">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <ul class="errorlist">
+                {% for error in form.email.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="phone-input-group">
+            <div class="form-group">
+              <label for="id_country_code" class="form-label">Country Code</label>
+              {{ form.country_code }}
+              {% if form.country_code.errors %}
+                <ul class="errorlist">
+                  {% for error in form.country_code.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label for="id_phone_number" class="form-label">Phone Number</label>
+              {{ form.phone_number }}
+              {% if form.phone_number.errors %}
+                <ul class="errorlist">
+                  {% for error in form.phone_number.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="id_password" class="form-label">Password</label>
+            <div class="password-input-group">
+              {{ form.password }}
+              <span class="password-toggle" id="togglePassword">
+                <i class="far fa-eye"></i>
+              </span>
+            </div>
+            {% if form.password.errors %}
+              <ul class="errorlist">
+                {% for error in form.password.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="id_confirm_password" class="form-label">Confirm Password</label>
+            <div class="password-input-group">
+              {{ form.confirm_password }}
+              <span class="password-toggle" id="toggleConfirmPassword">
+                <i class="far fa-eye"></i>
+              </span>
+            </div>
+            {% if form.confirm_password.errors %}
+              <ul class="errorlist">
+                {% for error in form.confirm_password.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+        </form>
+        <div class="password-requirements">
+          <p><strong>Password must meet the following requirements:</strong></p>
+          <ul>
+            <li>At least 8 characters long</li>
+            <li>At least one uppercase letter</li>
+            <li>At least one lowercase letter</li>
+            <li>At least one digit</li>
+            <li>At least one special character</li>
+          </ul>
+        </div>
+        
+        <div class="form-footer">
+          <p>Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Add styling to form fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('.form-control');
+      inputs.forEach(input => {
+        input.classList.add('form-control');
+        
+        // Add focus and blur effects
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.classList.remove('focused');
+        });
+      });
+      
+      // Add placeholder attributes if they're missing
+      document.getElementById('id_username').placeholder = 'Enter your username';
+      document.getElementById('id_full_name').placeholder = 'Enter your full name';
+      document.getElementById('id_email').placeholder = 'Enter your email';
+      document.getElementById('id_country_code').placeholder = 'Country code';
+      document.getElementById('id_phone_number').placeholder = '000 000 000';
+      document.getElementById('id_password').placeholder = 'Enter your password';
+      document.getElementById('id_confirm_password').placeholder = 'Confirm your password';
+      
+      // Set password field types
+      document.getElementById('id_password').type = 'password';
+      document.getElementById('id_confirm_password').type = 'password';
+      
+      // Password visibility toggle functionality
+      const togglePassword = document.getElementById('togglePassword');
+      const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+      const passwordField = document.getElementById('id_password');
+      const confirmPasswordField = document.getElementById('id_confirm_password');
+      
+      togglePassword.addEventListener('click', function() {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+      });
+      
+      toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordField.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+      });
+    });
+  </script>
+</body>
+</html>

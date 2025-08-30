@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn more about Prestige Wealth - Premium cryptocurrency investment platform with institutional-grade security and exceptional returns">
+  <title>Learn More | Prestige Wealth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-dark: #0A0E17;
+      --primary-gold: #D4AF37;
+      --primary-blue: #14213D;
+      --accent-purple: #6A0DAD;
+      --light-bg: #F8F9FA;
+      --white: #FFFFFF;
+      --text-dark: #212529;
+      --text-light: #6C757D;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-color: var(--white);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--primary-dark);
+      position: relative;
+    }
+    
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-gold), var(--accent-purple));
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+      color: var(--white);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Header & Navigation */
+    header {
+      background-color: var(--primary-dark);
+      padding: 15px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-family: 'Georgia', serif;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-gold);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo i {
+      margin-right: 8px;
+      color: var(--primary-gold);
+    }
+    
+    .desktop-menu {
+      display: flex;
+    }
+    
+    .desktop-menu ul {
+      display: flex;
+      list-style: none;
+    }
+    
+    .desktop-menu ul li {
+      margin: 0 15px;
+    }
+    
+    .desktop-menu ul li a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .desktop-menu ul li a:after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-gold);
+      transition: width 0.3s;
+    }
+    
+    .desktop-menu ul li a:hover {
+      color: var(--primary-gold);
+    }
+    
+    .desktop-menu ul li a:hover:after {
+      width: 100%;
+    }
+    
+    .header-buttons {
+      display: flex;
+      align-items: center;
+    }
+    
+    .login-btn {
+      color: var(--white);
+      margin-right: 15px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .login-btn:hover {
+      color: var(--primary-gold);
+    }
+    
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 21px;
+      cursor: pointer;
+    }
+    
+    .hamburger span {
+      height: 3px;
+      width: 100%;
+      background-color: var(--white);
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+    
+    .mobile-menu {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background-color: var(--primary-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 40px;
+      transform: translateX(-100%);
+      transition: transform 0.4s ease-in-out;
+      z-index: 999;
+    }
+    
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+    
+    .mobile-menu ul {
+      list-style: none;
+      text-align: center;
+    }
+    
+    .mobile-menu ul li {
+      margin: 25px 0;
+    }
+    
+    .mobile-menu ul li a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .mobile-menu ul li a:hover {
+      color: var(--primary-gold);
+    }
+    
+    /* Page Header */
+    .page-header {
+      padding: 150px 0 80px;
+      background: linear-gradient(rgba(10, 14, 23, 0.85), rgba(10, 14, 23, 0.85)), url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+      color: var(--white);
+      text-align: center;
+      position: relative;
+    }
+    
+    .stats-banner {
+      background: linear-gradient(90deg, var(--primary-gold), var(--accent-purple));
+      padding: 20px 0;
+      text-align: center;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    
+    .breadcrumb {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .breadcrumb a {
+      color: var(--primary-gold);
+      text-decoration: none;
+    }
+    
+    .breadcrumb span {
+      margin: 0 10px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .page-header h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+    }
+    
+    .page-header p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .investment-highlight {
+      background: rgba(212, 175, 55, 0.15);
+      border-left: 4px solid var(--primary-gold);
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 700px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    
+    .investment-highlight h3 {
+      color: var(--primary-gold);
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    
+    /* About Section */
+    .about-section {
+      padding: 100px 0;
+      background: var(--white);
+    }
+    
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+    
+    .about-text h2 {
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+    
+    .about-text p {
+      margin-bottom: 20px;
+      color: var(--text-light);
+    }
+    
+    .about-image {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .about-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* Mission Vision */
+    .mission-vision {
+      padding: 80px 0;
+      background: var(--light-bg);
+    }
+    
+    .mv-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    
+    .mv-card {
+      background: var(--white);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+    
+    .mv-icon {
+      font-size: 3rem;
+      color: var(--primary-gold);
+      margin-bottom: 20px;
+    }
+    
+    .mv-card h3 {
+      margin-bottom: 15px;
+      color: var(--primary-dark);
+    }
+    
+    /* Team Section */
+    .team-section {
+      padding: 100px 0;
+      background: var(--white);
+    }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    
+    .team-member {
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s;
+    }
+    
+    .team-member:hover {
+      transform: translateY(-10px);
+    }
+    
+    .team-img {
+      height: 300px;
+      background: linear-gradient(45deg, var(--primary-blue), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .team-img i {
+      font-size: 5rem;
+      color: var(--white);
+      opacity: 0.7;
+    }
+    
+    .team-info {
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .team-info h3 {
+      margin-bottom: 5px;
+      color: var(--primary-dark);
+    }
+    
+    .team-info p {
+      color: var(--primary-gold);
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    
+    /* Timeline Section */
+    .timeline-section {
+      padding: 100px 0;
+      background: var(--light-bg);
+    }
+    
+    .timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 50px auto 0;
+    }
+    
+    .timeline:before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: var(--primary-gold);
+    }
+    
+    .timeline-item {
+      width: 50%;
+      padding: 20px 40px;
+      position: relative;
+    }
+    
+    .timeline-item:nth-child(odd) {
+      left: 0;
+    }
+    
+    .timeline-item:nth-child(even) {
+      left: 50%;
+    }
+    
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      background: var(--primary-gold);
+      border-radius: 50%;
+      position: absolute;
+      top: 32px;
+      right: -10px;
+    }
+    
+    .timeline-item:nth-child(even) .timeline-dot {
+      left: -10px;
+    }
+    
+    .timeline-content {
+      background: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .timeline-content h3 {
+      margin-bottom: 10px;
+      color: var(--primary-dark);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      padding: 100px 0;
+      background: linear-gradient(to right, var(--primary-blue), var(--primary-dark));
+      color: var(--white);
+      text-align: center;
+    }
+    
+    .cta-section h2 {
+      margin-bottom: 20px;
+    }
+    
+    .cta-section p {
+      max-width: 700px;
+      margin: 0 auto 30px;
+      opacity: 0.9;
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--primary-dark);
+      color: var(--white);
+      padding: 70px 0 30px;
+    }
+    
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+    }
+    
+    .footer-col h3 {
+      margin-bottom: 20px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-col h3:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background: var(--primary-gold);
+    }
+    
+    .footer-col ul {
+      list-style: none;
+    }
+    
+    .footer-col ul li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-col ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.3s;
+    }
+    
+    .footer-col ul li a:hover {
+      color: var(--primary-gold);
+      padding-left: 5px;
+    }
+    
+    .social-icons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .social-icons a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      transition: all 0.3s;
+    }
+    
+    .social-icons a:hover {
+      background: var(--primary-gold);
+      color: var(--primary-dark);
+      transform: translateY(-3px);
+    }
+    
+    .copyright {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .about-content, .mv-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .timeline:before {
+        left: 30px;
+      }
+      
+      .timeline-item {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 20px;
+      }
+      
+      .timeline-item:nth-child(odd),
+      .timeline-item:nth-child(even) {
+        left: 0;
+      }
+      
+      .timeline-dot {
+        left: 20px !important;
+        right: auto;
+      }
+      
+      .desktop-menu {
+        display: none;
+      }
+      
+      .hamburger {
+        display: flex;
+      }
+      
+      .header-buttons .btn {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 120px 0 60px;
+      }
+      
+      .page-header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .stats-banner {
+        font-size: 1rem;
+        padding: 15px 0;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .page-header h1 {
+        font-size: 2rem;
+      }
+      
+      .mv-card, .team-info {
+        padding: 20px;
+      }
+      
+      .investment-highlight h3 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header & Navigation -->
+  <header>
+    <div class="container header-container">
+      <div class="logo">
+        <i class="fas fa-crown"></i>
+        Prestige Wealth
+      </div>
+      
+      <nav class="desktop-menu">
+        <ul>
+          <li><a href="{% url 'hero' %}">Home</a></li>
+          <li><a href="{% url 'about' %}" class="active">Learn More</a></li>
+          <li><a href="##">Investment Plans</a></li>
+          <li><a href="##">Testimonials</a></li>
+          <li><a href="##">Contact</a></li>
+        </ul>
+      </nav>
+      
+      <div class="header-buttons">
+        <a href="#" class="login-btn">Login</a>
+        <button class="btn btn-primary">Sign Up</button>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Mobile Menu -->
+  <nav class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="learn-more.html" class="active">Learn More</a></li>
+      <li><a href="investment-plans.html">Investment Plans</a></li>
+      <li><a href="testimonials.html">Testimonials</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="#">Login</a></li>
+      <li><a href="#" class="btn btn-primary">Sign Up</a></li>
+    </ul>
+  </nav>
+  
+  <!-- Stats Banner -->
+  <div class="stats-banner">
+    <div class="container">
+      We've paid over $15 million to our investors! Join and be part of our success story.
+    </div>
+  </div>
+  
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <a href="learn-more.html">Learn More</a>
+      </div>
+      <h1>About Prestige Wealth</h1>
+      <p>Discover how our premium cryptocurrency investment platform is transforming wealth creation through innovative strategies and institutional-grade security.</p>
+      
+      <div class="investment-highlight">
+        <h3>Over $15 Million Paid Out to Investors</h3>
+        <p>Join thousands of satisfied investors who are already building wealth with our proven strategies.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- About Section -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>Revolutionizing Crypto Investments</h2>
+          <p>Founded in 2018, Prestige Wealth emerged from a vision to democratize access to premium cryptocurrency investment opportunities that were previously available only to institutional investors.</p>
+          <p>Our team of financial experts, blockchain technologists, and security specialists have created a platform that combines cutting-edge technology with proven investment strategies to deliver exceptional returns.</p>
+          <p>With over $2.3 billion in assets under management and a community of 50,000+ investors, we've established ourselves as a trusted leader in the crypto investment space.</p>
+          <button class="btn btn-primary">Our Investment Strategies</button>
+        </div>
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1621761191315-27f0c87eb3cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1072&q=80" alt="Prestige Wealth Team">
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Mission Vision Section -->
+  <section class="mission-vision">
+    <div class="container">
+      <h2 class="section-title">Our Mission & Vision</h2>
+      <div class="mv-container">
+        <div class="mv-card">
+          <div class="mv-icon">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <h3>Our Mission</h3>
+          <p>To empower investors with institutional-grade cryptocurrency investment opportunities, providing exceptional returns through innovative strategies while maintaining the highest standards of security and transparency.</p>
+        </div>
+        
+        <div class="mv-card">
+          <div class="mv-icon">
+            <i class="fas fa-eye"></i>
+          </div>
+          <h3>Our Vision</h3>
+          <p>To become the world's most trusted cryptocurrency wealth platform, revolutionizing how individuals build and preserve generational wealth through digital assets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <h2 class="section-title">Leadership Team</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="team-img">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="team-info">
+            <h3>Robert Wellington</h3>
+            <p>CEO & Founder</p>
+            <p>Former Head of Investments at Goldman Sachs with 15+ years in financial markets.</p>
+          </div>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-img">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="team-info">
+            <h3>Sarah Chen</h3>
+            <p>Chief Investment Officer</p>
+            <p>Blockchain expert and quantitative analyst with a PhD in Financial Engineering.</p>
+          </div>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-img">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="team-info">
+            <h3>Michael Rodriguez</h3>
+            <p>Chief Security Officer</p>
+            <p>Cybersecurity specialist with extensive experience in blockchain security protocols.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Timeline Section -->
+  <section class="timeline-section">
+    <div class="container">
+      <h2 class="section-title">Our Journey</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2018</h3>
+            <p>Prestige Wealth founded with a vision to democratize premium crypto investments.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2019</h3>
+            <p>Launched our first investment products and reached $100M in assets under management.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2020</h3>
+            <p>Introduced algorithmic trading strategies, delivering 35% average annual returns.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2021</h3>
+            <p>Expanded to European markets and surpassed 25,000 investors on the platform.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2022</h3>
+            <p>Achieved ISO 27001 certification for information security management.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h3>2023</h3>
+            <p>Launched mobile app and reached $2.3B in assets under management. Paid over $15M to investors.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Start Your Investment Journey?</h2>
+      <p>Join thousands of investors who are already building wealth with Prestige Wealth's premium cryptocurrency investment platform.</p>
+      <button class="btn btn-primary">Get Started Today</button>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <div class="footer-col">
+        <h3>Prestige Wealth</h3>
+        <p>Building financial legacies through strategic cryptocurrency investments and wealth preservation.</p>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="learn-more.html">Learn More</a></li>
+          <li><a href="investment-plans.html">Investment Plans</a></li>
+          <li><a href="testimonials.html">Testimonials</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Disclaimer</a></li>
+          <li><a href="#">Compliance</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h3>Contact Us</h3>
+        <ul>
+          <li><i class="fas fa-envelope"></i> info@prestigewealth.com</li>
+          <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+          <li><i class="fas fa-map-marker-alt"></i> 750 Park Avenue, New York, NY</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="container copyright">
+      <p>&copy; 2023 Prestige Wealth. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    // Mobile Menu Toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileMenu.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (mobileMenu.classList.contains('active') && !mobileMenu.contains(e.target) && e.target !== hamburger) {
+        mobileMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+      }
+    });
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // Close mobile menu if open
+          if (mobileMenu.classList.contains('active')) {
+            mobileMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
