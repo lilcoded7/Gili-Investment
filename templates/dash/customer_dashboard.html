@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Prestige Wealth</title>
+  <title>Prestige Wealth | Trading Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
   <style>
-    /* Global Styles */
     :root {
       --primary-dark: #0A0E17;
       --primary-gold: #D4AF37;
@@ -19,9 +17,11 @@
       --text-light: #6C757D;
       --success: #28a745;
       --danger: #dc3545;
-      --sidebar-width: 250px;
+      --sidebar-width: 280px;
       --sidebar-collapsed: 70px;
-      --header-height: 70px;
+      --header-height: 80px;
+      --card-radius: 12px;
+      --transition: all 0.3s ease;
     }
     
     * {
@@ -32,10 +32,11 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--light-bg);
       color: var(--text-dark);
       line-height: 1.6;
       overflow-x: hidden;
-      background-color: #f5f7fb;
+      min-height: 100vh;
     }
     
     /* Layout */
@@ -48,12 +49,12 @@
     .sidebar {
       width: var(--sidebar-width);
       background: var(--primary-dark);
-      color: var(--white);
-      transition: all 0.3s ease;
+      transition: var(--transition);
       position: fixed;
       height: 100vh;
-      z-index: 100;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
     }
     
     .sidebar.collapsed {
@@ -61,11 +62,11 @@
     }
     
     .sidebar-header {
-      padding: 20px;
+      padding: 25px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       height: var(--header-height);
     }
     
@@ -82,18 +83,38 @@
     .logo i {
       margin-right: 10px;
       color: var(--primary-gold);
+      font-size: 1.8rem;
+    }
+    
+    .logo-text {
+      transition: opacity 0.3s;
+    }
+    
+    .sidebar.collapsed .logo-text {
+      opacity: 0;
+      display: none;
     }
     
     .toggle-btn {
-      background: none;
+      background: rgba(212, 175, 55, 0.1);
       border: none;
-      color: var(--white);
-      font-size: 1.2rem;
+      color: var(--primary-gold);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .toggle-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
     }
     
     .sidebar-menu {
-      padding: 20px 0;
+      padding: 25px 0;
     }
     
     .sidebar-menu ul {
@@ -107,63 +128,97 @@
     .sidebar-menu ul li a {
       display: flex;
       align-items: center;
-      padding: 12px 20px;
+      padding: 14px 25px;
       color: rgba(255, 255, 255, 0.8);
       text-decoration: none;
-      transition: all 0.3s;
+      transition: var(--transition);
+      position: relative;
     }
     
     .sidebar-menu ul li a:hover, 
     .sidebar-menu ul li a.active {
-      background: rgba(212, 175, 55, 0.2);
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0) 100%);
       color: var(--primary-gold);
-      padding-left: 25px;
+      padding-left: 30px;
     }
     
     .sidebar-menu ul li a i {
-      margin-right: 10px;
-      font-size: 1.1rem;
+      margin-right: 15px;
+      font-size: 1.2rem;
       width: 20px;
       text-align: center;
+      transition: var(--transition);
     }
     
-    .sidebar.collapsed .menu-text,
-    .sidebar.collapsed .logo-text {
+    .sidebar.collapsed .menu-text {
+      opacity: 0;
       display: none;
+    }
+    
+    .sidebar.collapsed .sidebar-menu ul li a {
+      padding: 14px 0;
+      justify-content: center;
+    }
+    
+    .sidebar.collapsed .sidebar-menu ul li a i {
+      margin-right: 0;
+      font-size: 1.4rem;
     }
     
     /* Main Content */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
-      transition: margin-left 0.3s ease;
+      transition: var(--transition);
+      padding: 20px;
     }
     
     .main-content.expanded {
       margin-left: var(--sidebar-collapsed);
     }
     
-    /* Header */
+    /* Mobile menu button */
+    .mobile-menu-btn {
+      display: none;
+      background: var(--primary-blue);
+      border: none;
+      color: var(--primary-gold);
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 15px;
+      font-size: 1.2rem;
+    }
+    
+    /* Top Header */
     .top-header {
       background: var(--white);
-      padding: 0 20px;
+      padding: 0 25px;
       height: var(--header-height);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      position: sticky;
-      top: 0;
-      z-index: 99;
+      border-radius: var(--card-radius);
+      margin-bottom: 25px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
     
     .search-box {
       display: flex;
       align-items: center;
       background: var(--light-bg);
-      border-radius: 20px;
-      padding: 8px 15px;
-      width: 300px;
+      border-radius: 30px;
+      padding: 10px 20px;
+      width: 350px;
+      transition: var(--transition);
+    }
+    
+    .search-box:focus-within {
+      background: var(--white);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
     }
     
     .search-box input {
@@ -172,26 +227,33 @@
       outline: none;
       width: 100%;
       padding: 5px;
+      color: var(--text-dark);
     }
     
     .search-box i {
-      color: var(--text-light);
+      color: var(--primary-gold);
+      margin-right: 10px;
     }
     
     .user-menu {
       display: flex;
       align-items: center;
+      gap: 20px;
     }
     
     .notification {
       position: relative;
-      margin-right: 20px;
       cursor: pointer;
     }
     
     .notification i {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       color: var(--text-light);
+      transition: var(--transition);
+    }
+    
+    .notification:hover i {
+      color: var(--primary-gold);
     }
     
     .notification-badge {
@@ -201,8 +263,8 @@
       background: var(--danger);
       color: var(--white);
       font-size: 0.7rem;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -213,11 +275,12 @@
       display: flex;
       align-items: center;
       cursor: pointer;
+      gap: 12px;
     }
     
     .user-avatar {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
       display: flex;
@@ -225,7 +288,7 @@
       justify-content: center;
       color: var(--white);
       font-weight: bold;
-      margin-right: 10px;
+      font-size: 1.1rem;
     }
     
     .user-info {
@@ -235,37 +298,15 @@
     
     .user-name {
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
     
     .user-role {
       font-size: 0.8rem;
-      color: var(--text-light);
+      color: var(--primary-gold);
     }
     
-    /* Dashboard Content */
-    .dashboard-content {
-      padding: 20px;
-    }
-    
-    .welcome-banner {
-      background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-      color: var(--white);
-      padding: 25px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-    }
-    
-    .welcome-banner h1 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-    }
-    
-    .welcome-banner p {
-      opacity: 0.9;
-      margin-bottom: 15px;
-    }
-    
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -275,47 +316,57 @@
     
     .stat-card {
       background: var(--white);
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: var(--card-radius);
+      padding: 25px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
       display: flex;
       align-items: center;
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      border-color: rgba(212, 175, 55, 0.2);
     }
     
     .stat-icon {
       width: 60px;
       height: 60px;
-      border-radius: 12px;
+      border-radius: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      margin-right: 15px;
+      font-size: 1.8rem;
+      margin-right: 20px;
     }
     
     .balance-icon {
-      background: rgba(212, 175, 55, 0.2);
+      background: rgba(212, 175, 55, 0.15);
       color: var(--primary-gold);
     }
     
     .investment-icon {
-      background: rgba(106, 13, 173, 0.2);
+      background: rgba(106, 13, 173, 0.15);
       color: var(--accent-purple);
     }
     
     .profit-icon {
-      background: rgba(40, 167, 69, 0.2);
+      background: rgba(40, 167, 69, 0.15);
       color: var(--success);
     }
     
     .trades-icon {
-      background: rgba(220, 53, 69, 0.2);
+      background: rgba(220, 53, 69, 0.15);
       color: var(--danger);
     }
     
     .stat-info h3 {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       margin-bottom: 5px;
+      font-weight: 700;
+      color: var(--primary-dark);
     }
     
     .stat-info p {
@@ -323,24 +374,27 @@
       font-size: 0.9rem;
     }
     
+    /* Dashboard Grid */
     .dashboard-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 20px;
+      gap: 25px;
     }
     
-    @media (max-width: 992px) {
+    @media (max-width: 1200px) {
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
     }
     
+    /* Chart Container */
     .chart-container {
       background: var(--white);
-      border-radius: 10px;
+      border-radius: var(--card-radius);
       padding: 20px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
     
     .chart-header {
@@ -348,120 +402,169 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
     
     .chart-title {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 600;
+      color: var(--primary-dark);
     }
     
     .chart-controls {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .symbol-select {
+      padding: 8px 15px;
+      background: var(--light-bg);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      margin-right: 10px;
     }
     
     .timeframe-btn {
-      padding: 5px 10px;
+      padding: 8px 15px;
       background: var(--light-bg);
-      border: none;
-      border-radius: 5px;
-      font-size: 0.8rem;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      font-size: 0.85rem;
       cursor: pointer;
+      color: var(--text-light);
+      transition: var(--transition);
     }
     
-    .timeframe-btn.active {
-      background: var(--primary-gold);
+    .timeframe-btn:hover, .timeframe-btn.active {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
       color: var(--white);
+      border-color: transparent;
     }
     
     .tradingview-widget-container {
-      height: 400px;
+      height: 500px;
       width: 100%;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      background: var(--light-bg);
+      position: relative;
     }
     
+    /* Trade Form */
     .trade-form-container {
       background: var(--white);
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: var(--card-radius);
+      padding: 25px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .trade-form-container h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
     }
     
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 500;
       font-size: 0.9rem;
+      color: var(--text-dark);
     }
     
     .form-control {
       width: 100%;
-      padding: 10px 15px;
-      border: 1px solid #e2e8f0;
-      border-radius: 5px;
+      padding: 12px 18px;
+      background: var(--light-bg);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
       font-size: 0.9rem;
+      color: var(--text-dark);
+      transition: var(--transition);
     }
     
     .form-control:focus {
       outline: none;
+      background: var(--white);
       border-color: var(--primary-gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
     
     .trade-type {
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 15px;
+      margin-bottom: 20px;
     }
     
     .trade-type-btn {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       text-align: center;
-      border: 1px solid #e2e8f0;
-      border-radius: 5px;
+      background: var(--light-bg);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
+      transition: var(--transition);
+      color: var(--text-dark);
     }
     
-    .trade-type-btn.active {
+    .trade-type-btn:hover, .trade-type-btn.active {
       background: var(--success);
       color: var(--white);
-      border-color: var(--success);
+      border-color: transparent;
+      transform: translateY(-2px);
     }
     
-    .trade-type-btn.sell.active {
+    .trade-type-btn.sell.active, .trade-type-btn.sell:hover {
       background: var(--danger);
-      border-color: var(--danger);
     }
     
     .btn-trade {
       width: 100%;
-      padding: 12px;
+      padding: 15px;
       background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
       color: var(--white);
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: var(--transition);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+      font-size: 1rem;
     }
     
     .btn-trade:hover {
       opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
     }
     
     /* Positions Table */
     .positions-container {
       background: var(--white);
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: var(--card-radius);
+      padding: 25px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-      margin-top: 20px;
+      margin-top: 25px;
       overflow-x: auto;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .positions-container h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
     }
     
     .table {
@@ -470,25 +573,27 @@
     }
     
     .table th, .table td {
-      padding: 12px 15px;
+      padding: 15px;
       text-align: left;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
     
     .table th {
       background: var(--light-bg);
       font-weight: 600;
+      color: var(--primary-dark);
     }
     
     .table tr:hover {
-      background: #f8f9fa;
+      background: var(--light-bg);
     }
     
     .status-badge {
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 500;
+      display: inline-block;
     }
     
     .status-open {
@@ -502,20 +607,26 @@
     }
     
     .btn-close {
-      padding: 5px 10px;
+      padding: 6px 12px;
       background: var(--danger);
       color: var(--white);
       border: none;
-      border-radius: 3px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 0.8rem;
+      transition: var(--transition);
+    }
+    
+    .btn-close:hover {
+      background: #c82333;
+      transform: translateY(-1px);
     }
     
     /* Support Chat */
     .support-chat {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 25px;
+      right: 25px;
       z-index: 1000;
     }
     
@@ -531,20 +642,27 @@
       font-size: 1.5rem;
       cursor: pointer;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+    }
+    
+    .chat-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
     
     .chat-window {
       position: absolute;
       bottom: 70px;
       right: 0;
-      width: 300px;
-      height: 400px;
+      width: 350px;
+      height: 450px;
       background: var(--white);
-      border-radius: 10px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+      border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       display: none;
       flex-direction: column;
       overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.2);
     }
     
     .chat-window.active {
@@ -552,8 +670,8 @@
     }
     
     .chat-header {
-      padding: 15px;
-      background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+      padding: 20px;
+      background: var(--primary-dark);
       color: var(--white);
       display: flex;
       align-items: center;
@@ -562,6 +680,7 @@
     
     .chat-title {
       font-weight: 600;
+      font-size: 1.1rem;
     }
     
     .chat-close {
@@ -569,61 +688,127 @@
       border: none;
       color: var(--white);
       cursor: pointer;
+      font-size: 1.2rem;
     }
     
     .chat-messages {
       flex: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
     }
     
     .message {
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px 16px;
+      border-radius: 12px;
       max-width: 80%;
       font-size: 0.9rem;
+      line-height: 1.4;
     }
     
     .message.support {
-      background: #f1f1f1;
+      background: var(--light-bg);
       align-self: flex-start;
+      border-bottom-left-radius: 5px;
+      color: var(--text-dark);
     }
     
     .message.user {
       background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
       color: var(--white);
       align-self: flex-end;
+      border-bottom-right-radius: 5px;
     }
     
     .chat-input {
       display: flex;
-      padding: 10px;
-      border-top: 1px solid #e2e8f0;
+      padding: 15px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
     
     .chat-input input {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
+      padding: 12px;
+      background: var(--light-bg);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
       outline: none;
+      color: var(--text-dark);
     }
     
     .chat-send {
       background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
       color: var(--white);
       border: none;
-      border-radius: 20px;
-      padding: 10px 15px;
+      border-radius: 8px;
+      padding: 12px 18px;
       margin-left: 10px;
       cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .chat-send:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    
+    /* Notifications */
+    .notification-toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: var(--white);
+      color: var(--text-dark);
+      padding: 15px 20px;
+      border-radius: var(--card-radius);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 2000;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      border-left: 4px solid var(--primary-gold);
+    }
+    
+    .notification-toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .notification-icon {
+      font-size: 1.5rem;
+      color: var(--primary-gold);
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--primary-dark);
+    }
+    
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 1.1rem;
     }
     
     /* Responsive Styles */
-    @media (max-width: 992px) {
+    @media (max-width: 1200px) {
       .sidebar {
         width: var(--sidebar-collapsed);
       }
@@ -638,27 +823,32 @@
       }
       
       .search-box {
-        width: 200px;
+        width: 250px;
       }
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
       .sidebar {
-        left: -100%;
-      }
-      
-      .sidebar.active {
-        left: 0;
+        transform: translateX(-100%);
         width: var(--sidebar-width);
       }
       
-      .sidebar.active .menu-text,
-      .sidebar.active .logo-text {
-        display: block;
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar .menu-text,
+      .sidebar .logo-text {
+        display: flex;
       }
       
       .main-content {
         margin-left: 0;
+        padding: 15px;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
       }
       
       .mobile-overlay {
@@ -668,7 +858,7 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
-        z-index: 99;
+        z-index: 900;
         display: none;
       }
       
@@ -677,7 +867,7 @@
       }
       
       .top-header {
-        padding: 0 15px;
+        padding: 0 20px;
       }
       
       .search-box {
@@ -688,12 +878,79 @@
         display: none;
       }
       
-      .dashboard-content {
-        padding: 15px;
-      }
-      
       .stats-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .dashboard-grid {
+        gap: 20px;
+      }
+      
+      .tradingview-widget-container {
+        height: 400px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .chart-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+      
+      .chat-window {
+        width: 320px;
+        right: -10px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .top-header {
+        padding: 0 15px;
+      }
+      
+      .dashboard-content {
+        padding: 10px;
+      }
+      
+      .stat-card {
+        padding: 20px;
+      }
+      
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+      
+      .stat-info h3 {
+        font-size: 1.4rem;
+      }
+      
+      .chart-container, .trade-form-container, .positions-container {
+        padding: 20px;
+      }
+      
+      .timeframe-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+      
+      .symbol-select {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+      
+      .chat-window {
+        width: 300px;
+        height: 400px;
+        right: 10px;
       }
     }
   </style>
@@ -717,9 +974,12 @@
           <li><a href="#" class="active"><i class="fas fa-home"></i> <span class="menu-text">Dashboard</span></a></li>
           <li><a href="#"><i class="fas fa-chart-line"></i> <span class="menu-text">Trading</span></a></li>
           <li><a href="#"><i class="fas fa-wallet"></i> <span class="menu-text">Wallet</span></a></li>
+          <li><a href="#"><i class="fas fa-money-bill-wave"></i> <span class="menu-text">Deposit</span></a></li>
+          <li><a href="#"><i class="fas fa-hand-holding-usd"></i> <span class="menu-text">Withdrawal</span></a></li>
           <li><a href="#"><i class="fas fa-history"></i> <span class="menu-text">History</span></a></li>
           <li><a href="#"><i class="fas fa-gem"></i> <span class="menu-text">Investment Plans</span></a></li>
           <li><a href="#"><i class="fas fa-user"></i> <span class="menu-text">Profile</span></a></li>
+          <li><a href="#"><i class="fas fa-headset"></i> <span class="menu-text">Support</span></a></li>
           <li><a href="#"><i class="fas fa-cog"></i> <span class="menu-text">Settings</span></a></li>
           <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span class="menu-text">Logout</span></a></li>
         </ul>
@@ -732,13 +992,17 @@
     <div class="main-content" id="mainContent">
       <!-- Top Header -->
       <header class="top-header">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+        
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search...">
+          <input type="text" placeholder="Search markets, assets...">
         </div>
         
         <div class="user-menu">
-          <div class="notification">
+          <div class="notification" id="notificationIcon">
             <i class="fas fa-bell"></i>
             <span class="notification-badge">3</span>
           </div>
@@ -755,13 +1019,6 @@
       
       <!-- Dashboard Content -->
       <div class="dashboard-content">
-        <!-- Welcome Banner -->
-        <div class="welcome-banner">
-          <h1>Welcome back, John!</h1>
-          <p>Track your investments, analyze market trends, and execute trades all in one place.</p>
-          <button class="btn-trade">Start Trading</button>
-        </div>
-        
         <!-- Stats Grid -->
         <div class="stats-grid">
           <div class="stat-card">
@@ -812,43 +1069,29 @@
             <div class="chart-header">
               <div class="chart-title">BTC/USD Chart</div>
               <div class="chart-controls">
-                <button class="timeframe-btn active">1H</button>
-                <button class="timeframe-btn">4H</button>
-                <button class="timeframe-btn">1D</button>
-                <button class="timeframe-btn">1W</button>
+                <select class="symbol-select" id="symbolSelect">
+                  <option value="BINANCE:BTCUSDT">BTC/USD</option>
+                  <option value="BINANCE:ETHUSDT">ETH/USD</option>
+                  <option value="BINANCE:XRPUSDT">XRP/USD</option>
+                  <option value="BINANCE:LTCUSDT">LTC/USD</option>
+                  <option value="BINANCE:ADAUSDT">ADA/USD</option>
+                </select>
+                <button class="timeframe-btn active" data-timeframe="60">1H</button>
+                <button class="timeframe-btn" data-timeframe="240">4H</button>
+                <button class="timeframe-btn" data-timeframe="D">1D</button>
+                <button class="timeframe-btn" data-timeframe="W">1W</button>
               </div>
             </div>
             
             <!-- TradingView Widget -->
             <div class="tradingview-widget-container">
-              <div id="tradingview-chart" style="height: 100%; width: 100%">
-                <!-- Chart will be simulated with CSS -->
-                <div class="chart-simulation">
-                  <table class="charts-css line show-labels show-primary-axis show-data-axes" id="my-chart">
-                    <tbody>
-                      <tr>
-                        <td style="--start: 0.1; --size: 0.3;"> <span class="data"> $46,120 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.3; --size: 0.5;"> <span class="data"> $46,250 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.5; --size: 0.8;"> <span class="data"> $46,500 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.8; --size: 0.6;"> <span class="data"> $46,350 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.6; --size: 0.9;"> <span class="data"> $46,600 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.9; --size: 0.7;"> <span class="data"> $46,450 </span> </td>
-                      </tr>
-                      <tr>
-                        <td style="--start: 0.7; --size: 0.95;"> <span class="data"> $46,650 </span> </td>
-                      </tr>
-                    </tbody>
-                  </table>
+              <div id="tradingview_chart" style="height: 100%; width: 100%">
+                <!-- TradingView Chart will be loaded here -->
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-light);">
+                  <div style="text-align: center;">
+                    <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p>Loading TradingView chart...</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1002,26 +1245,74 @@
         </div>
       </div>
     </div>
+    
+    <!-- Notification Toast -->
+    <div class="notification-toast" id="notificationToast">
+      <div class="notification-icon">
+        <i class="fas fa-coins"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">Withdrawal Processed</div>
+        <div class="notification-message" id="toastMessage">User John Doe withdrew $2,500.00</div>
+      </div>
+      <button class="notification-close" id="toastClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
   </div>
 
+  <!-- TradingView Widget Script -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  
   <script>
+    // Initialize TradingView Chart
+    let tvWidget = null;
+    
+    function initTradingViewChart(symbol = "BINANCE:BTCUSDT", interval = "60") {
+      if (tvWidget !== null) {
+        tvWidget.remove();
+      }
+      
+      tvWidget = new TradingView.widget({
+        "autosize": true,
+        "symbol": symbol,
+        "interval": interval,
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_top_toolbar": false,
+        "hide_legend": false,
+        "save_image": false,
+        "container_id": "tradingview_chart",
+        "studies": [
+          "RSI@tv-basicstudies",
+          "MACD@tv-basicstudies"
+        ]
+      });
+    }
+    
     // Toggle Sidebar
     const toggleSidebar = document.getElementById('toggleSidebar');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const mobileOverlay = document.getElementById('mobileOverlay');
     
-    toggleSidebar.addEventListener('click', () => {
+    function toggleSidebarFunc() {
       sidebar.classList.toggle('collapsed');
       mainContent.classList.toggle('expanded');
-    });
-    
-    // Mobile sidebar toggle
-    if (window.innerWidth <= 768) {
-      sidebar.classList.remove('collapsed');
-      sidebar.classList.add('active');
-      mobileOverlay.classList.add('active');
     }
+    
+    function toggleMobileSidebar() {
+      sidebar.classList.toggle('active');
+      mobileOverlay.classList.toggle('active');
+    }
+    
+    toggleSidebar.addEventListener('click', toggleSidebarFunc);
+    mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
     
     mobileOverlay.addEventListener('click', () => {
       sidebar.classList.remove('active');
@@ -1044,12 +1335,25 @@
     
     // Toggle Timeframe Buttons
     const timeframeBtns = document.querySelectorAll('.timeframe-btn');
+    const symbolSelect = document.getElementById('symbolSelect');
     
     timeframeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', function() {
         timeframeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        this.classList.add('active');
+        
+        // Update chart with selected timeframe
+        const symbol = symbolSelect.value;
+        const timeframe = this.getAttribute('data-timeframe');
+        initTradingViewChart(symbol, timeframe);
       });
+    });
+    
+    // Symbol selection change
+    symbolSelect.addEventListener('change', function() {
+      const symbol = this.value;
+      const activeTimeframe = document.querySelector('.timeframe-btn.active').getAttribute('data-timeframe');
+      initTradingViewChart(symbol, activeTimeframe);
     });
     
     // Toggle Chat Window
@@ -1079,9 +1383,6 @@
       }
       
       alert(`Trade executed: ${isBuy ? 'BUY' : 'SELL'} ${amount} USD of ${symbol}`);
-      
-      // In a real application, you would send this data to your backend
-      // and update the positions table accordingly
     });
     
     // Close Trade
@@ -1094,23 +1395,64 @@
         const profit = row.cells[5].textContent;
         
         alert(`Closed position for ${symbol}. ${profit} realized.`);
-        
-        // In a real application, you would send a request to close the position
-        // and update the UI accordingly
         row.remove();
       });
     });
     
-    // Responsive adjustments
+    // Notification system
+    const notificationToast = document.getElementById('notificationToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toastClose = document.getElementById('toastClose');
+    
+    // Sample withdrawal messages
+    const withdrawalMessages = [
+      "User Michael Rodriguez withdrew $3,200.00",
+      "User Sarah Chen withdrew $1,850.00",
+      "User Robert Wellington withdrew $5,500.00",
+      "User Emma Thompson withdrew $2,100.00",
+      "User Alex Johnson withdrew $4,300.00"
+    ];
+    
+    function showNotification() {
+      // Select a random message
+      const randomMessage = withdrawalMessages[Math.floor(Math.random() * withdrawalMessages.length)];
+      toastMessage.textContent = randomMessage;
+      
+      // Show the notification
+      notificationToast.classList.add('show');
+      
+      // Play notification sound
+      const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-retro-game-emergency-alarm-1000.mp3');
+      audio.play().catch(e => console.log("Audio play failed:", e));
+      
+      // Auto hide after 5 seconds
+      setTimeout(() => {
+        notificationToast.classList.remove('show');
+      }, 5000);
+    }
+    
+    // Close notification when X is clicked
+    toastClose.addEventListener('click', () => {
+      notificationToast.classList.remove('show');
+    });
+    
+    // Initialize chart and other elements when page loads
+    window.addEventListener('load', () => {
+      // Initialize TradingView chart
+      initTradingViewChart();
+      
+      // Set up periodic notifications (every 2 minutes, 1 minute, 5 seconds for demo)
+      setInterval(showNotification, 125000); // 2 minutes 5 seconds
+      
+      // Also show one immediately after 2 seconds
+      setTimeout(showNotification, 2000);
+    });
+    
+    // Handle window resize
     window.addEventListener('resize', () => {
-      if (window.innerWidth <= 768) {
+      if (window.innerWidth <= 992) {
         sidebar.classList.remove('collapsed');
         mainContent.classList.remove('expanded');
-      } else {
-        sidebar.classList.add('collapsed');
-        mainContent.classList.add('expanded');
-        sidebar.classList.remove('active');
-        mobileOverlay.classList.remove('active');
       }
     });
   </script>
