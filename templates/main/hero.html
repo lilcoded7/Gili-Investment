@@ -788,8 +788,8 @@
       </nav>
       
       <div class="header-buttons">
-        <a href="#" class="login-btn">Login</a>
-        <button class="btn btn-primary">Sign Up</button>
+        <a href="{% url 'accounts:login' %}" class="login-btn">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary">Sign Up</a>
       </div>
       
       <div class="hamburger" id="hamburger">
@@ -843,7 +843,7 @@
       <p>Prestige Wealth offers exclusive cryptocurrency investment opportunities with institutional-grade security and exceptional returns.</p>
       <div class="hero-buttons">
         <button class="btn btn-primary">Explore Investments</button>
-        <button class="btn btn-outline">Learn More</button>
+       <a href="{% url 'trade:about' %}"> <button class="btn btn-outline">Learn More</button></a>
       </div>
     </div>
     

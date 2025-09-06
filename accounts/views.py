@@ -55,7 +55,7 @@ def login(request):
     form = LoginForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         auth_login(request, form.user)
-        return redirect('dashboard')
+        return redirect('trade:customer_dashboard')
     return render(request, "auth/login.html", {'form':form})
 
 

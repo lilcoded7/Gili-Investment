@@ -345,7 +345,7 @@
   <!-- Header & Navigation -->
   <header>
     <div class="container header-container">
-      <a href="{% url 'hero' %}" class="logo">
+      <a href="{% url 'trade:hero' %}" class="logo">
         <i class="fas fa-crown"></i>
         Prestige Wealth
       </a>
@@ -415,7 +415,7 @@
           </div>
         {% endif %}
         
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% url 'accounts:login' %}">
           {% csrf_token %}
           
           <div class="form-group">
@@ -459,7 +459,7 @@
         </form>
         
         <div class="form-footer">
-          <p>Don't have an account? <a href="{% url 'register' %}">Register Now</a></p>
+          <p>Don't have an account? <a href="{% url 'accounts:register' %}">Register Now</a></p>
         </div>
       </div>
     </div>

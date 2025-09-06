@@ -351,7 +351,7 @@
   <!-- Header & Navigation -->
   <header>
     <div class="container header-container">
-      <a href="{% url 'hero' %}" class="logo">
+      <a href="{% url 'trade:hero' %}" class="logo">
         <i class="fas fa-crown"></i>
         Prestige Wealth
       </a>
@@ -413,7 +413,7 @@
             <h4 style="color: #28a745;"> {{message}}</h4>
         {% endfor %}
         
-        <form method="post" action="{% url 'register' %}">
+        <form method="post" action="{% url 'accounts:register' %}">
           {% csrf_token %}
           
           <div class="form-group">
@@ -526,7 +526,7 @@
         </div>
         
         <div class="form-footer">
-          <p>Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+          <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign In</a></p>
         </div>
       </div>
     </div>
