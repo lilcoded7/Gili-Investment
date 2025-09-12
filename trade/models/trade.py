@@ -1,23 +1,49 @@
 from setup.basemodel import BaseModel
 from trade.models.customers import Customer
+from trade.models.accounts import Account
 from django.db import models
 
 
 class Trade(BaseModel):
-    ACTION = [("Buy", "Buy"), ("Sell", "Sell")]
-    STATUS = [
-        ("pending", "pending"),
-        ("Lost", "Lost"),
-        ("Win", "Win"),
+    TRADE_TYPE_CHOICES = [
+        ('BUY', 'Buy'),
+        ('SELL', 'Sell'),
     ]
 
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
-    action = models.CharField(max_length=100, choices=ACTION)
-    status = models.CharField(max_length=100, choices=STATUS)
-    leverage = models.IntegerField(default=1)
-    stop_loss = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
-    take_profit = models.DecimalField(decimal_places=2, max_digits=11, default=0.00)
+    SYMBOL_CHOICES = [
+        ('BTC/USD', 'BTC/USD'),
+        ('ETH/USD', 'ETH/USD'),
+        ('XRP/USD', 'XRP/USD'),
+        ('LTC/USD', 'LTC/USD'),
+        ('ADA/USD', 'ADA/USD'),
+    ]
+
+    LEVERAGE_CHOICES = [
+        ('1x', '1x'),
+        ('5x', '5x'),
+        ('10x', '10x'),
+        ('25x', '25x'),
+        ('50x', '50x'),
+    ]
+
+    STATUS = [
+        ('open', 'open'),
+        ('closed', 'closed'),
+    ]
+
+    trade_type = models.CharField(max_length=4, choices=TRADE_TYPE_CHOICES, default='BUY')
+    symbol = models.CharField(max_length=10, choices=SYMBOL_CHOICES, null=True, blank=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=100, null=True, blank=True, choices=STATUS, default='open')
+    leverage = models.CharField(max_length=3, choices=LEVERAGE_CHOICES, default='1x')
+    stop_loss = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    take_profit = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    
+    customer_profit = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    profit_loss = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+
+    close_trade = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.customer.full_name
+        return f"{self.trade_type} {self.symbol} (${self.amount})"
+

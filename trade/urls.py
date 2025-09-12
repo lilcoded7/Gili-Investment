@@ -10,5 +10,7 @@ urlpatterns = [
     path("chats/", chat_list, name="chat_list"),
     path("chat/<uuid:chat_id>/", chat_view, name="chat_view"),
     path("chat/upload/<uuid:chat_id>/", upload_file, name="upload_file"),
-
+    path('trade/', execute_trade, name='execute_trade'),
 ]
+
+

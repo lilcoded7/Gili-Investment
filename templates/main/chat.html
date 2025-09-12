@@ -126,3 +126,39 @@
 
 </body>
 </html>
+
+
+<form method="post" action="{% url 'trade:execute_trade' %}">
+                {% csrf_token %}
+                
+                <div class="trade-type">
+                    {{ form.trade_type }}
+                </div>
+
+                <div class="form-group">
+                    <label for="symbol">Symbol</label>
+                    {{ form.symbol }}
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Investment Amount (USD)</label>
+                    {{ form.amount }}
+                </div>
+
+                <div class="form-group">
+                    <label for="leverage">Leverage</label>
+                    {{ form.leverage }}
+                </div>
+
+                <div class="form-group">
+                    <label for="stopLoss">Stop Loss</label>
+                    {{ form.stop_loss }}
+                </div>
+
+                <div class="form-group">
+                    <label for="takeProfit">Take Profit</label>
+                    {{ form.take_profit }}
+                </div>
+
+                <button type="submit" class="btn-trade">Execute Trade</button>
+            </form>

@@ -1194,116 +1194,113 @@
           <!-- Trade Form -->
           <div class="trade-form-container">
             <h3>Execute Trade</h3>
+            <form method="post" action="{% url 'trade:execute_trade' %}">
             
-            <div class="trade-type">
-              <div class="trade-type-btn active" id="buyBtn">BUY</div>
-              <div class="trade-type-btn sell" id="sellBtn">SELL</div>
-            </div>
-            
-            <div class="form-group">
-              <label for="symbol">Symbol</label>
-              <select class="form-control" id="symbol">
-                <option>BTC/USD</option>
-                <option>ETH/USD</option>
-                <option>XRP/USD</option>
-                <option>LTC/USD</option>
-                <option>ADA/USD</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="amount">Investment Amount (USD)</label>
-              <input type="number" class="form-control" id="amount" placeholder="1000">
-            </div>
-            
-            <div class="form-group">
-              <label for="leverage">Leverage</label>
-              <select class="form-control" id="leverage">
-                <option>1x</option>
-                <option>5x</option>
-                <option>10x</option>
-                <option>25x</option>
-                <option>50x</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="stopLoss">Stop Loss</label>
-              <input type="number" class="form-control" id="stopLoss" placeholder="46000">
-            </div>
-            
-            <div class="form-group">
-              <label for="takeProfit">Take Profit</label>
-              <input type="number" class="form-control" id="takeProfit" placeholder="48000">
-            </div>
-            
-            <button class="btn-trade" id="executeTrade">Execute Trade</button>
+              {% csrf_token %}
+                
+                <div class="trade-type">
+                    {{ form.trade_type }}
+                </div>
+
+                <div class="form-group">
+                    <label for="symbol">Symbol</label>
+                    {{ form.symbol }}
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Investment Amount (USD)</label>
+                    {{ form.amount }}
+                </div>
+
+                <div class="form-group">
+                    <label for="leverage">Leverage</label>
+                    {{ form.leverage }}
+                </div>
+
+                <div class="form-group">
+                    <label for="stopLoss">Stop Loss</label>
+                    {{ form.stop_loss }}
+                </div>
+
+                <div class="form-group">
+                    <label for="takeProfit">Take Profit</label>
+                    {{ form.take_profit }}
+                </div>
+
+                <button type="submit" class="btn-trade">Execute Trade</button>
+            </form>
           </div>
         </div>
         
         <!-- Positions Table -->
         <div class="positions-container">
-          <h3>Your Positions</h3>
-          
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Symbol</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Entry Price</th>
-                <th>Current Price</th>
-                <th>Profit/Loss</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>BTC/USD</td>
-                <td>BUY</td>
-                <td>$1,000</td>
-                <td>$46,120</td>
-                <td>$46,650</td>
-                <td style="color: var(--success);">+$115.00</td>
-                <td><span class="status-badge status-open">Open</span></td>
-                <td><button class="btn-close">Close</button></td>
-              </tr>
-              <tr>
-                <td>ETH/USD</td>
-                <td>SELL</td>
-                <td>$800</td>
-                <td>$2,850</td>
-                <td>$2,820</td>
-                <td style="color: var(--success);">+$84.21</td>
-                <td><span class="status-badge status-open">Open</span></td>
-                <td><button class="btn-close">Close</button></td>
-              </tr>
-              <tr>
-                <td>XRP/USD</td>
-                <td>BUY</td>
-                <td>$500</td>
-                <td>$0.55</td>
-                <td>$0.53</td>
-                <td style="color: var(--danger);">-$18.18</td>
-                <td><span class="status-badge status-open">Open</span></td>
-                <td><button class="btn-close">Close</button></td>
-              </tr>
-              <tr>
-                <td>LTC/USD</td>
-                <td>BUY</td>
-                <td>$1,200</td>
-                <td>$68.50</td>
-                <td>$70.25</td>
-                <td style="color: var(--success);">+$30.66</td>
-                <td><span class="status-badge status-open">Open</span></td>
-                <td><button class="btn-close">Close</button></td>
-              </tr>
-            </tbody>
-          </table>
+  <h3>Your Positions</h3>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Leverage</th>
+        <th>Stop Loss</th>
+        <th>Take Profit</th>
+        <th>Profit/Loss</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for trade in open_trades %}
+        <tr>
+          <td>{{ trade.symbol }}</td>
+          <td>{{ trade.trade_type }}</td>
+          <td>${{ trade.amount }}</td>
+          <td>{{ trade.leverage }}</td>
+          <td>
+            {% if trade.stop_loss %}
+              ${{ trade.stop_loss }}
+            {% else %}
+              –
+            {% endif %}
+          </td>
+          <td>
+            {% if trade.take_profit %}
+              ${{ trade.take_profit }}
+            {% else %}
+              –
+            {% endif %}
+          </td>
+          <td style="color: {% if trade.profit_loss >= 0 %}var(--success){% else %}var(--danger){% endif %};">
+            {% if trade.profit_loss >= 0 %}+{% endif %}{{ trade.profit_loss }}
+          </td>
+          <td>
+            <span class="status-badge status-{{ trade.status }}">
+              {{ trade.status|capfirst }}
+            </span>
+          </td>
+          <td>
+            {% if trade.status == "open" %}
+              <form method="post" action="##">
+                {% csrf_token %}
+                <button type="submit" class="btn-close">Close</button>
+              </form>
+            {% else %}
+              <span class="status-badge">Closed</span>
+            {% endif %}
+          </td>  
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="9">No open positions</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
         </div>
-      </div>
-    </div>
+
+        </div>
+        </div>
     
     <!-- Support Chat -->
     <div class="support-chat">

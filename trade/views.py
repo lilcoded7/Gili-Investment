@@ -1,12 +1,14 @@
 import uuid
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from trade.models.accounts import Account
+from django.contrib import messages
 from django.db.models import Q
 
 from trade.models.chats import Chat, Message
-
+from trade.forms import *
 
 # Public pages
 def hero(request):
@@ -18,17 +20,50 @@ def about(request):
 
 
 def customer_dashboard(request):
-    return render(request, "dash/customer_dashboard.html")
+    form = TradeForm(request.POST)
+    open_trades = Trade.objects.filter()
+    customer_account = Account.objects.filter(customer__user=request.user).first()
+
+    context = {
+        'form':form,
+        'open_trades':open_trades,
+        'customer':customer_account
+    }
+    return render(request, "dash/customer_dashboard.html", context)
 
 
 # Chat views
 @login_required
 def chat_list(request):
-    """
-    List all chats for the logged-in user (customer or staff).
-    """
+    form = TradeForm(request.POST)
+    
     chats = Chat.objects.filter(Q(customer=request.user) | Q(staff=request.user))
-    return render(request, "chat/chat_list.html", {"chats": chats})
+
+    context = {
+        'form':form,
+        'chats':chats
+    }
+    return render(request, "chat/chat_list.html", context)
+
+
+def execute_trade(request):
+    account = Account.objects.filter(customer__user=request.user).first()
+    if request.method == "POST":
+        form = TradeForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+
+            if not account.balance >=amount:
+                messages.error(request, 'Insuffcient balance')
+                return redirect('trade:customer_dashboard')
+
+            account.balance-=amount
+            account.save()
+            form.save()
+            return redirect('trade:customer_dashboard') 
+    else:
+        form = TradeForm()
+    return render(request, 'trade_form.html', {'form': form})
 
 
 @login_required
