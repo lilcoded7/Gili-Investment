@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prestige Wealth | Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root{
+      --primary-dark:#0A0E17;--primary-gold:#D4AF37;--primary-blue:#14213D;
+      --accent-purple:#6A0DAD;--light-bg:#F8F9FA;--white:#FFFFFF;
+      --text-dark:#212529;--text-light:#6C757D;--success:#28a745;--danger:#dc3545;
+      --warning:#ffc107;--info:#17a2b8;--sidebar-width:280px;--sidebar-collapsed:70px;
+      --header-height:80px;--card-radius:12px;--transition:all .3s ease;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Helvetica,Arial,sans-serif;background:var(--light-bg);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+    .dashboard-container{display:flex;min-height:100vh;position:relative}
+    
+    /* Sidebar */
+    .sidebar{width:var(--sidebar-width);background:var(--primary-dark);position:fixed;height:100vh;left:0;top:0;z-index:1000;padding-bottom:40px;box-shadow:5px 0 15px rgba(0,0,0,.2);transition:var(--transition);overflow-y:auto}
+    .sidebar.collapsed{width:var(--sidebar-collapsed)}
+    .sidebar-header{height:var(--header-height);display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid rgba(212,175,55,.12)}
+    .logo{font-family:Georgia,serif;color:var(--primary-gold);font-weight:700;display:flex;align-items:center;gap:10px}
+    .logo i{font-size:1.6rem}
+    .toggle-btn{background:rgba(212,175,55,.08);border:none;color:var(--primary-gold);width:36px;height:36px;border-radius:50%;cursor:pointer}
+    .sidebar-menu{padding:18px 0}
+    .sidebar-menu ul{list-style:none}
+    .sidebar-menu a{display:flex;align-items:center;padding:12px 20px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;gap:12px;transition:var(--transition)}
+    .sidebar-menu a i{width:20px;text-align:center}
+    .sidebar-menu a:hover,.sidebar-menu a.active{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);color:var(--primary-gold);padding-left:26px}
+    .admin-badge{background:var(--accent-purple);color:white;font-size:0.7rem;padding:2px 6px;border-radius:4px;margin-left:auto}
+    
+    /* Main Content */
+    .main-content{flex:1;margin-left:var(--sidebar-width);transition:var(--transition);padding:20px;width:calc(100% - var(--sidebar-width))}
+    .main-content.expanded{margin-left:var(--sidebar-collapsed);width:calc(100% - var(--sidebar-collapsed))}
+    .top-header{background:var(--white);height:var(--header-height);display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-radius:var(--card-radius);box-shadow:0 5px 15px rgba(0,0,0,.05);margin-bottom:20px}
+    .search-box{display:flex;align-items:center;background:var(--light-bg);padding:10px 16px;border-radius:30px;width:360px}
+    .search-box input{border:none;background:transparent;outline:none;width:100%}
+    .user-menu{display:flex;align-items:center;gap:18px}
+    .notification{position:relative;cursor:pointer}
+    .notification-badge{position:absolute;top:-6px;right:-6px;background:var(--danger);color:var(--white);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+    .user-profile{display:flex;align-items:center;gap:12px}
+    .user-avatar{width:45px;height:45px;border-radius:50%;background:linear-gradient(135deg,var(--primary-gold),var(--accent-purple));display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700}
+    
+    /* Stats Grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:22px}
+    .stat-card{background:var(--white);padding:18px;border-radius:var(--card-radius);box-shadow:0 5px 15px rgba(0,0,0,.05);display:flex;align-items:center;gap:16px;border:1px solid rgba(0,0,0,.04);transition:var(--transition)}
+    .stat-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,.1)}
+    .stat-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+    .users-icon{background:rgba(106,13,173,.12);color:var(--accent-purple)}
+    .revenue-icon{background:rgba(212,175,55,.12);color:var(--primary-gold)}
+    .trades-icon{background:rgba(40,167,69,.12);color:var(--success)}
+    .pending-icon{background:rgba(255,193,7,.12);color:var(--warning)}
+    .stat-info h3{font-size:1.5rem;margin-bottom:4px}
+    .stat-info p{color:var(--text-light);font-size:0.9rem}
+    .stat-change{display:flex;align-items:center;gap:4px;font-size:0.85rem;margin-top:4px}
+    .change-positive{color:var(--success)}
+    .change-negative{color:var(--danger)}
+    
+    /* Dashboard Grid */
+    .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+    .chart-container{background:var(--white);padding:18px;border-radius:var(--card-radius);box-shadow:0 5px 15px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.04)}
+    .chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+    .chart-title{font-weight:600}
+    .chart-placeholder{height:300px;background:var(--light-bg);border-radius:var(--card-radius);display:flex;align-items:center;justify-content:center;color:var(--text-light)}
+    
+    /* Tables */
+    .data-container{background:var(--white);padding:18px;border-radius:var(--card-radius);box-shadow:0 5px 15px rgba(0,0,0,.05);margin-bottom:22px;border:1px solid rgba(0,0,0,.04);overflow:auto}
+    .data-container h3{margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+    .view-all{color:var(--primary-gold);font-size:0.9rem;text-decoration:none;display:flex;align-items:center;gap:4px}
+    .table{width:100%;border-collapse:collapse;min-width:600px}
+    .table th,.table td{padding:12px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left}
+    .table th{background:var(--light-bg);font-weight:700;position:sticky;top:0}
+    .table tr{cursor:pointer;transition:var(--transition)}
+    .table tr:not(:has(th)):hover{background:rgba(212,175,55,.05)}
+    
+    /* Status Badges */
+    .status-badge{padding:6px 12px;border-radius:20px;font-weight:600;font-size:0.85rem}
+    .status-active{background:rgba(40,167,69,.12);color:var(--success)}
+    .status-pending{background:rgba(255,193,7,.12);color:var(--warning)}
+    .status-inactive{background:rgba(108,117,125,.12);color:var(--text-light)}
+    .status-completed{background:rgba(23,162,184,.12);color:var(--info)}
+    
+    /* Buttons */
+    .btn-action{padding:6px 10px;border-radius:6px;border:none;cursor:pointer;font-size:0.85rem;display:inline-flex;align-items:center;gap:4px}
+    .btn-edit{background:var(--info);color:#fff}
+    .btn-delete{background:var(--danger);color:#fff}
+    .btn-view{background:var(--primary-blue);color:#fff}
+    
+    /* Tabs */
+    .tabs{display:flex;gap:8px;border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:16px}
+    .tab-btn{padding:8px 16px;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;font-weight:600;color:var(--text-light)}
+    .tab-btn.active{color:var(--primary-gold);border-bottom-color:var(--primary-gold)}
+    
+    /* Modal */
+    .modal-overlay {position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition);}
+    .modal-overlay.active {opacity: 1; visibility: visible;}
+    .modal {background: var(--white); border-radius: var(--card-radius); width: 100%; max-width: 600px; padding: 0; overflow: hidden; transform: translateY(20px); transition: var(--transition);}
+    .modal-overlay.active .modal {transform: translateY(0);}
+    .modal-header {padding: 20px; border-bottom: 1px solid rgba(0,0,0,.06); display: flex; justify-content: space-between; align-items: center;}
+    .modal-header h3 {margin: 0; color: var(--primary-dark);}
+    .modal-close {background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light);}
+    .modal-body {padding: 20px; max-height: 60vh; overflow-y: auto;}
+    .modal-footer {padding: 16px 20px; background: var(--light-bg); display: flex; justify-content: flex-end; gap: 12px;}
+    .btn-modal {padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;}
+    .btn-modal-primary {background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple)); color: white;}
+    .btn-modal-secondary {background: var(--light-bg); color: var(--text-dark); border: 1px solid rgba(0,0,0,.1);}
+    
+    /* Form Elements */
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;margin-bottom:6px;font-weight:600;color:var(--text-dark)}
+    .form-control{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:var(--light-bg);transition:var(--transition)}
+    .form-control:focus{outline:none;border-color:var(--primary-gold);box-shadow:0 0 0 3px rgba(212,175,55,.15)}
+    
+    /* Responsive */
+    @media(max-width:1200px){
+      .main-content{margin-left:var(--sidebar-collapsed);width:calc(100% - var(--sidebar-collapsed))}
+      .dashboard-grid{grid-template-columns:1fr}
+    } 
+    @media(max-width:992px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.active{transform:translateX(0)}
+      .main-content{margin-left:0;width:100%;padding:12px}
+      .search-box{width:280px}
+    }
+    @media(max-width:768px){
+      .search-box{display:none}
+      .stats-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:576px){
+      .stats-grid{grid-template-columns:1fr}
+      .user-profile div:last-child{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo"><i class="fas fa-crown"></i><span class="logo-text">Prestige Wealth</span></div>
+        <button id="toggleSidebar" class="toggle-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li><a href="{% url 'trade:dash_admin_support' %}" class="active"><i class="fas fa-tachometer-alt"></i><span class="menu-text">Dashboard</span></a></li>
+          <li><a href="{% url 'trade:customers' %}"><i class="fas fa-users"></i><span class="menu-text">Customers</span><span class="admin-badge">Admin</span></a></li>
+          <li><a href="{% url 'trade:customer_trade' %}"><i class="fas fa-chart-line"></i><span class="menu-text">Trading</span><span class="admin-badge">Admin</span></a></li>
+          <li><a href="{% url 'trade:transactions' %}"><i class="fas fa-money-bill-wave"></i><span class="menu-text">Transactions</span><span class="admin-badge">Admin</span></a></li>
+
+          <li><a href="##"><i class="fas fa-gem"></i><span class="menu-text">Suscribed Investment Plans</span><span class="admin-badge">Admin</span></a></li>
+
+
+          <li><a href="{% url 'trade:support_chats' %}"><i class="fas fa-headset"></i><span class="menu-text">Support Tickets</span><span class="admin-badge">Admin</span></a></li>
+          <li><a href="{% url 'accounts:logout_view' %}"><i class="fas fa-sign-out-alt"></i><span class="menu-text">Logout</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    {% block content %}
+
+    {% endblock content %}
+    
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Sidebar toggle functionality
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+      const toggleSidebar = document.getElementById("toggleSidebar");
+      
+      toggleSidebar?.addEventListener("click", () => {
+        sidebar.classList.toggle("collapsed");
+        mainContent.classList.toggle("expanded");
+      });
+
+      // Mobile menu toggle
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileOverlay = document.createElement("div");
+      mobileOverlay.className = "mobile-overlay";
+      mobileOverlay.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;display:none";
+      document.body.appendChild(mobileOverlay);
+      
+      mobileMenuBtn?.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+        mobileOverlay.style.display = sidebar.classList.contains("active") ? "block" : "none";
+        document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : "";
+      });
+
+      mobileOverlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        mobileOverlay.style.display = "none";
+        document.body.style.overflow = "";
+      });
+
+      // Responsive behavior
+      window.addEventListener("resize", () => {
+        if (window.innerWidth <= 992) {
+          sidebar.classList.remove("collapsed");
+          mainContent.classList.remove("expanded");
+          mobileMenuBtn.style.display = "block";
+        } else {
+          mobileMenuBtn.style.display = "none";
+          mobileOverlay.style.display = "none";
+          sidebar.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+      });
+
+      // Initialize responsive behavior
+      if (window.innerWidth <= 992) {
+        mobileMenuBtn.style.display = "block";
+      }
+
+      // Table row click functionality
+      document.querySelectorAll(".table tr:not(:has(th))").forEach(row => {
+        row.addEventListener("click", (e) => {
+          if (!e.target.closest("button")) {
+            console.log("Row clicked - would open details for:", row.cells[0].textContent);
+            // In a real application, this would open a modal or navigate to a detail page
+          }
+        });
+      });
+
+      // Notification badge
+      const notifCount = document.getElementById("notifCount");
+      const notifIcon = document.getElementById("notificationIcon");
+      
+      notifIcon.addEventListener("click", () => {
+        alert("Notifications panel would open here");
+        notifCount.textContent = "0";
+        notifCount.style.display = "none";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Customer(BaseModel):
+    agent = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='chat_agent')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(null=True, blank=True)
     full_name = models.CharField(max_length=100)
@@ -13,5 +14,6 @@ class Customer(BaseModel):
 
     referial_code = models.CharField(max_length=100, null=True, blank=True)
 
+    is_active = models.BooleanField(default=True)
     def __str__(self):
         return f"Name: {self.full_name}"

@@ -4,7 +4,7 @@ from django.contrib import messages
 from accounts.utils import EmailSender
 from django.contrib.auth import get_user_model
 from trade.models.customers import Customer
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 import random
 
 # Create your views here.
@@ -58,6 +58,10 @@ def login(request):
         return redirect('trade:customer_dashboard')
     return render(request, "auth/login.html", {'form':form})
 
+
+def logout_view(request):
+    logout(request)
+    return redirect('accounts:login')
 
 def activate_account(request, customer_id):
     form = ActivateAccounForm()

@@ -786,11 +786,18 @@
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </nav>
-      
+      {% if request.user.is_authenticated %}
+       <div class="header-buttons">
+       
+        <a href="{% url 'trade:customer_dashboard' %}" class="btn btn-primary">Dashboard</a>
+      </div>
+      {% else %}
       <div class="header-buttons">
         <a href="{% url 'accounts:login' %}" class="login-btn">Login</a>
         <a href="{% url 'accounts:register' %}" class="btn btn-primary">Sign Up</a>
       </div>
+      {% endif %}
+
       
       <div class="hamburger" id="hamburger">
         <span></span>

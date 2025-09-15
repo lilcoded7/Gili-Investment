@@ -13,9 +13,6 @@ class Trade(BaseModel):
     SYMBOL_CHOICES = [
         ('BTC/USD', 'BTC/USD'),
         ('ETH/USD', 'ETH/USD'),
-        ('XRP/USD', 'XRP/USD'),
-        ('LTC/USD', 'LTC/USD'),
-        ('ADA/USD', 'ADA/USD'),
     ]
 
     LEVERAGE_CHOICES = [
@@ -30,7 +27,7 @@ class Trade(BaseModel):
         ('open', 'open'),
         ('closed', 'closed'),
     ]
-
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     trade_type = models.CharField(max_length=4, choices=TRADE_TYPE_CHOICES, default='BUY')
     symbol = models.CharField(max_length=10, choices=SYMBOL_CHOICES, null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)

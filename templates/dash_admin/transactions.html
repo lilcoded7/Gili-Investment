@@ -1,0 +1,126 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content" id="mainContent">
+  <!-- Header -->
+  <header class="top-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button id="mobileMenuBtn" class="mobile-menu-btn" 
+              style="display:none;padding:8px;border-radius:8px;background:var(--primary-blue);color:var(--primary-gold);border:none">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="search-box">
+        <i class="fas fa-search" style="color:var(--primary-gold);margin-right:10px"></i>
+        <input placeholder="Search transactions..." />
+      </div>
+    </div>
+    <div class="user-menu">
+      <div class="notification" id="notificationIcon">
+        <i class="fas fa-bell"></i>
+        <span id="notifCount" class="notification-badge">3</span>
+      </div>
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div style="display:flex;flex-direction:column;text-align:left">
+          <div style="font-weight:700">Admin User</div>
+          <div style="color:var(--primary-gold);font-size:.85rem">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon users-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-info">
+        <h3>2,458</h3>
+        <p>Total Users</p>
+        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 12.5%</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon revenue-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="stat-info">
+        <h3>$1.24M</h3>
+        <p>Total Revenue</p>
+        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 8.3%</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon trades-icon"><i class="fas fa-exchange-alt"></i></div>
+      <div class="stat-info">
+        <h3>12,847</h3>
+        <p>Total Trades</p>
+        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 5.7%</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon pending-icon"><i class="fas fa-clock"></i></div>
+      <div class="stat-info">
+        <h3>47</h3>
+        <p>Pending Requests</p>
+        <div class="stat-change change-negative"><i class="fas fa-arrow-down"></i> 2.1%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions Table -->
+  <div class="data-container">
+    <h3 style="display:flex;justify-content:space-between;align-items:center;">
+      Transactions
+      <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+    </h3>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Reference</th>
+          <th>Remarks</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in transactions %}
+        <tr>
+          <td>{{ txn.customer.full_name }}</td>
+          <td>{{ txn.get_transaction_type_display }}</td>
+          <td>${{ txn.amount }}</td>
+          <td>
+            {% if txn.status == "completed" %}
+              <span class="status-badge status-active">Completed</span>
+            {% elif txn.status == "pending" %}
+              <span class="status-badge status-warning">Pending</span>
+            {% else %}
+              <span class="status-badge status-inactive">Failed</span>
+            {% endif %}
+          </td>
+          <td>{{ txn.reference }}</td>
+          <td>{{ txn.remarks|default:"-" }}</td>
+          <td>{{ txn.created_at|date:"M d, Y H:i" }}</td>
+          <td>
+            <a href="{% url 'transaction_detail' txn.id %}" class="btn-action btn-view">
+              <i class="fas fa-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" style="text-align:center;color:#666;padding:20px;">
+            No transactions found
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock content %}

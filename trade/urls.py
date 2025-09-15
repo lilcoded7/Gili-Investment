@@ -1,3 +1,4 @@
+# urls.py
 from django.urls import path
 from trade.views import *
 
@@ -7,10 +8,26 @@ urlpatterns = [
     path("", hero, name="hero"),
     path("about/", about, name="about"),
     path("customers/dashboard/", customer_dashboard, name="customer_dashboard"),
-    path("chats/", chat_list, name="chat_list"),
-    path("chat/<uuid:chat_id>/", chat_view, name="chat_view"),
     path("chat/upload/<uuid:chat_id>/", upload_file, name="upload_file"),
-    path('trade/', execute_trade, name='execute_trade'),
+    path("trade/", execute_trade, name="execute_trade"),
+    path("deposit/account/", deposit_account, name="deposit_account"),
+    path("withdraw/fund/", withdraw_fund, name="withdraw_fund"),
+    path("list/trade/", list_trade, name="list_trade"),
+    path("wallet/", wallet_view, name="wallet"),
+    path("profile/view/", profile_view, name="profile_view"),
+    path("update/profile/", update_profile, name="update_profile"),
+    path("send-chat/", send_chat, name="send_chat"),
+    path("support/", customer_support, name="customer_support"),
+    path("trade/admin/dash/", dash_admin_support, name="dash_admin_support"),
+    path("customers/", customers, name="customers"),
+    path("customers/<uuid:customer_id>/", customer_detail, name="customer_detail"),
+    path("customer/trade/", customer_trade, name="customer_trade"),
+    path("transactions/", transactions, name="transactions"),
+    path("trades/", customer_trade, name="customer_trade"),
+    path("trade/<uuid:trade_id>/edit/", edit_trade, name="edit_trade"),
+    
+    path("dash/support/", support_chat_dashboard, name="support_chat"),
+    path("support/conversation/<uuid:customer_id>/", get_conversation, name="get_conversation"),
+    path("support/send_message/", send_message, name="send_message"),
+    path("support/close_conversation/<uuid:conversation_id>/", close_conversation, name="close_conversation"),
 ]
-
-

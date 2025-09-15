@@ -1,0 +1,338 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="main-content" id="mainContent">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+            <button id="mobileMenuBtn" class="mobile-menu-btn" style="display:none;padding:8px;border-radius:8px;background:var(--primary-blue);color:var(--primary-gold);border:none">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="search-box">
+                <i class="fas fa-search" style="color:var(--primary-gold);margin-right:10px"></i>
+                <input placeholder="Search..." />
+            </div>
+        </div>
+        <div class="user-menu">
+            <div class="notification" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <span id="notifCount" class="notification-badge" style="display:none">0</span>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    {% if customer and customer.full_name %}
+                        {{ customer.full_name|slice:":1"|upper }}
+                    {% else %}{{ request.user.username|slice:":1"|upper }}{% endif %}
+                </div>
+                <div style="display:flex;flex-direction:column;text-align:left">
+                    <div style="font-weight:700">{{ request.user.username|default:"John Doe" }}</div>
+                    <div style="color:var(--primary-gold);font-size:.85rem">
+                        {% if customer %}Balance: ${{ customer.balance }}{% else %}No Account{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="deposit-container">
+            <div class="deposit-header">
+                <h2>My Profile</h2>
+                <p>Manage your account information and preferences</p>
+            </div>
+            
+            <!-- Profile Overview Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon balance-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ account.account_number|default:"N/A" }}</h3>
+                        <p>Account ID</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon investment-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ customer.created_at|date:"M d, Y"|default:"N/A" }}</h3>
+                        <p>Member Since</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon profit-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ total_transactions|default:"0" }}</h3>
+                        <p>Total Transactions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon trades-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ verified_status|default:"No" }}</h3>
+                        <p>Verification Status</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Form -->
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px;">
+                <!-- Personal Information -->
+                <div class="trade-form-container">
+                    <h3>Personal Information</h3>
+                    
+                    {% if messages %}
+                    <div class="messages-django">
+                        {% for message in messages %}
+                        <div class="msg-item {% if message.tags %}msg-{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'trade:update_profile' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" id="full_name" name="full_name" class="form-control" 
+                                   value="{{ customer.full_name|default:'' }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-control" 
+                                   value="{{ request.user.email|default:'' }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" 
+                                   value="{{ customer.phone|default:'' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" name="country" class="form-control" 
+                                   value="{{ customer.country|default:'' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" class="form-control" rows="3">{{ customer.address|default:'' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-trade">Update Profile</button>
+                    </form>
+                </div>
+                
+                <!-- Account Security -->
+                <div class="trade-form-container">
+                    <h3>Account Security</h3>
+                    
+                    <div class="form-group">
+                        <label>Two-Factor Authentication</label>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                            <span>{% if customer.two_factor_enabled %}Enabled{% else %}Disabled{% endif %}</span>
+                            <a href="#" class="btn-modal btn-modal-{% if customer.two_factor_enabled %}secondary{% else %}primary{% endif %}" 
+                               style="padding: 8px 16px; font-size: 0.9rem;">
+                                {% if customer.two_factor_enabled %}Disable{% else %}Enable{% endif %} 2FA
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Last Login</label>
+                        <p style="margin: 8px 0; color: var(--text-light);">
+                            {{ request.user.last_login|date:"M d, Y H:i"|default:"Never" }}
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Account Status</label>
+                        <p style="margin: 8px 0;">
+                            <span class="status-badge status-completed">Active</span>
+                        </p>
+                    </div>
+                    
+                    
+                   
+                </div>
+            </div>
+            
+           
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const profileForm = document.querySelector('form[action="{% url 'trade:update_profile' %}"]');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            const fullName = document.getElementById('full_name');
+            const email = document.getElementById('email');
+            
+            if (!fullName.value.trim()) {
+                e.preventDefault();
+                alert('Please enter your full name');
+                fullName.focus();
+                return false;
+            }
+            
+            if (!email.value.trim()) {
+                e.preventDefault();
+                alert('Please enter your email address');
+                email.focus();
+                return false;
+            }
+        });
+    }
+    
+  
+    // All other existing JavaScript from the dashboard
+    const toggleSidebar = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    
+    if (toggleSidebar) {
+        toggleSidebar.addEventListener("click", () => { 
+            sidebar.classList.toggle("collapsed"); 
+            mainContent.classList.toggle("expanded"); 
+        });
+    }
+
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+    
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", () => { 
+            sidebar.classList.toggle("active"); 
+            mobileOverlay.classList.toggle("active"); 
+            document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : ""; 
+        });
+    }
+    
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener("click", () => { 
+            sidebar.classList.remove("active"); 
+            mobileOverlay.classList.remove("active"); 
+            document.body.style.overflow = ""; 
+        });
+    }
+});
+</script>
+
+<style>
+/* Additional styles for profile page */
+.user-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-gold), var(--accent-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 auto 20px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.verification-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(40, 167, 69, 0.08);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.verification-status.pending {
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.verification-status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.verification-status.pending .verification-status-icon {
+    background: var(--primary-gold);
+}
+
+.document-upload {
+    background: var(--light-bg);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.document-upload h4 {
+    margin-top: 0;
+    color: var(--primary-dark);
+}
+
+.upload-area {
+    border: 2px dashed rgba(0,0,0,.1);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-gold);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.upload-area i {
+    font-size: 2rem;
+    color: var(--primary-gold);
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+
+.btn-upload {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+</style>
+{% endblock content %}

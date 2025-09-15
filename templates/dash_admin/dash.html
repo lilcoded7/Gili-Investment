@@ -1,0 +1,199 @@
+{% extends 'admin/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+ <div class="main-content" id="mainContent">
+      <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" style="display:none;padding:8px;border-radius:8px;background:var(--primary-blue);color:var(--primary-gold);border:none"><i class="fas fa-bars"></i></button>
+          <div class="search-box"><i class="fas fa-search" style="color:var(--primary-gold);margin-right:10px"></i><input placeholder="Search users, transactions..." /></div>
+        </div>
+        <div class="user-menu">
+          <div class="notification" id="notificationIcon"><i class="fas fa-bell"></i><span id="notifCount" class="notification-badge">3</span></div>
+          <div class="user-profile">
+            <div class="user-avatar">A</div>
+            <div style="display:flex;flex-direction:column;text-align:left">
+              <div style="font-weight:700">Admin User</div>
+              <div style="color:var(--primary-gold);font-size:.85rem">Administrator</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon users-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <h3>{{ customers }}</h3>
+          <p>Total Users</p>
+          <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 12.5%</div>
+        </div>
+      </div>
+
+  <div class="stat-card">
+    <div class="stat-icon revenue-icon"><i class="fas fa-dollar-sign"></i></div>
+    <div class="stat-info">
+      <h3>${{ total_revenue|floatformat:2 }}</h3>
+      <p>Total Revenue</p>
+      <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 8.3%</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon trades-icon"><i class="fas fa-exchange-alt"></i></div>
+    <div class="stat-info">
+      <h3>{{ total_trades }}</h3>
+      <p>Total Trades</p>
+      <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 5.7%</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon pending-icon"><i class="fas fa-clock"></i></div>
+    <div class="stat-info">
+      <h3>{{ pending_withdrawals }}</h3>
+      <p>Pending Requests</p>
+      <div class="stat-change change-negative"><i class="fas fa-arrow-down"></i> 2.1%</div>
+    </div>
+  </div>
+</div>
+
+
+
+      <div class="data-container">
+        <h3>
+          Recent Trade
+          <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </h3>
+        <table class="table">
+        <thead>
+            <tr>
+            <th>User</th>
+            <th>Symbol</th>
+            <th>Trade Type</th>
+            <th>Leverage</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Profit/Loss</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trade in trades %}
+            <tr>
+                <td>{{ trade.customer.full_name }}</td>
+                <td>{{ trade.symbol }}</td>
+                <td>{{ trade.trade_type }}</td>
+                <td>{{ trade.leverage }}</td>
+                <td>${{ trade.amount }}</td>
+                <td>
+                {% if trade.status == "open" %}
+                    <span class="status-badge status-active">Open</span>
+                {% else %}
+                    <span class="status-badge status-inactive">Closed</span>
+                {% endif %}
+                </td>
+                <td>
+                {% if trade.profit_loss >= 0 %}
+                    <span style="color: green;">+${{ trade.profit_loss }}</span>
+                {% else %}
+                    <span style="color: red;">${{ trade.profit_loss }}</span>
+                {% endif %}
+                </td>
+                <td>
+                <button class="btn-action btn-view">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align:center;">No open trades</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="data-container">
+        <h3>
+            Pending Withdrawals
+            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Requested</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for w in withdrawals %}
+                <tr>
+                <td>{{ w.customer.user.username }}</td>
+                <td>${{ w.amount }}</td>
+                <td>{{ w.created_at|timesince }} ago</td>
+                <td>
+                    <button class="btn-action btn-edit"><i class="fas fa-check"></i> Approve</button>
+                    <button class="btn-action btn-delete"><i class="fas fa-times"></i> Deny</button>
+                </td>
+                </tr>
+            {% empty %}
+                <tr>
+                <td colspan="4" style="text-align:center;">No pending withdrawals</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="data-container">
+        <h3>
+            Recent Deposits
+            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for d in deposits %}
+                <tr>
+                <td>{{ d.customer.user.username }}</td>
+                <td>${{ d.amount }}</td>
+                <td>{{ d.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    {% if d.status == "credited" %}
+                    <span class="status-badge status-completed">Completed</span>
+                    {% elif d.status == "pending" %}
+                    <span class="status-badge status-pending">Processing</span>
+                    {% else %}
+                    <span class="status-badge status-failed">Failed</span>
+                    {% endif %}
+                </td>
+                </tr>
+            {% empty %}
+                <tr>
+                <td colspan="4" style="text-align:center;">No recent deposits</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+      </div>
+    </div>
+
+    {% endblock content %}

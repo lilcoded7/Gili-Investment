@@ -1,0 +1,229 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="main-content" id="mainContent">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+            <button id="mobileMenuBtn" class="mobile-menu-btn" style="display:none;padding:8px;border-radius:8px;background:var(--primary-blue);color:var(--primary-gold);border:none">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="search-box">
+                <i class="fas fa-search" style="color:var(--primary-gold);margin-right:10px"></i>
+                <input placeholder="Search trades..." />
+            </div>
+        </div>
+        <div class="user-menu">
+            <div class="notification" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <span id="notifCount" class="notification-badge" style="display:none">0</span>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    {% if customer and customer.customer and customer.customer.full_name %}
+                        {{ customer.customer.full_name|slice:":1"|upper }}
+                    {% else %}JD{% endif %}
+                </div>
+                <div style="display:flex;flex-direction:column;text-align:left">
+                    <div style="font-weight:700">{{ request.user.username|default:"John Doe" }}</div>
+                    <div style="color:var(--primary-gold);font-size:.85rem">
+                        {% if customer %}Balance: ${{ customer.balance }}{% else %}No Account{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="deposit-container">
+            <div class="deposit-header">
+                <h2>Trade History</h2>
+                <p>View your trading activity and performance</p>
+            </div>
+            
+            <div class="positions-container">
+                <h3>Your Trades</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Leverage</th>
+                            <th>Entry Price</th>
+                            
+                            <th>Profit/Loss</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                        <tr>
+                            <td>{{ trade.created_at|date:"M d, Y H:i" }}</td>
+                            <td>{{ trade.symbol }}</td>
+                            <td>
+                                <span class="status-badge {% if trade.trade_type == 'buy' %}status-completed{% else %}status-failed{% endif %}">
+                                    {{ trade.trade_type|capfirst }}
+                                </span>
+                            </td>
+                            <td>${{ trade.amount }}</td>
+                            <td>{{ trade.leverage }}x</td>
+                            <td>${{ trade.amount|default:"—" }}</td>
+                           
+                            <td style="color: {% if trade.profit_loss >= 0 %}var(--success){% else %}var(--danger){% endif %};">
+                                {% if trade.profit_loss %}${{ trade.profit_loss }}{% else %}—{% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if trade.status == 'open' %}status-open
+                                    {% elif trade.status == 'closed' %}status-completed
+                                    {% else %}status-failed{% endif %}">
+                                    {{ trade.status|capfirst }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" style="text-align: center;">No trades yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy wallet address functionality
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const walletAddress = this.getAttribute('data-wallet');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(walletAddress).then(() => {
+                // Change icon to checkmark temporarily
+                const icon = this.querySelector('i');
+                const originalClass = icon.className;
+                
+                icon.className = 'fas fa-check';
+                this.style.backgroundColor = '#28a745';
+                
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    this.style.backgroundColor = '';
+                }, 2000);
+                
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy wallet address');
+            });
+        });
+    });
+
+    // All other existing JavaScript from the dashboard
+    const toggleSidebar = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    
+    if (toggleSidebar) {
+        toggleSidebar.addEventListener("click", () => { 
+            sidebar.classList.toggle("collapsed"); 
+            mainContent.classList.toggle("expanded"); 
+        });
+    }
+
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+    
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", () => { 
+            sidebar.classList.toggle("active"); 
+            mobileOverlay.classList.toggle("active"); 
+            document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : ""; 
+        });
+    }
+    
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener("click", () => { 
+            sidebar.classList.remove("active"); 
+            mobileOverlay.classList.remove("active"); 
+            document.body.style.overflow = ""; 
+        });
+    }
+
+    // Search functionality
+    const searchInput = document.querySelector('.search-box input');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const tables = document.querySelectorAll('.table tbody');
+            
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchText) ? '' : 'none';
+                });
+            });
+        });
+    }
+});
+</script>
+
+<style>
+.copy-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: var(--primary-dark);
+}
+
+.wallet-short {
+    font-family: monospace;
+}
+
+.status-open {
+    background: rgba(40, 167, 69, 0.12);
+    color: var(--success);
+}
+
+.status-completed {
+    background: rgba(40, 167, 69, 0.12);
+    color: var(--success);
+}
+
+.status-pending {
+    background: rgba(255, 193, 7, 0.12);
+    color: #ffc107;
+}
+
+.status-failed {
+    background: rgba(220, 53, 69, 0.12);
+    color: var(--danger);
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+</style>
+{% endblock content %}

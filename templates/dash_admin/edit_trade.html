@@ -1,0 +1,43 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<div class="main-content" id="mainContent">
+  <div class="data-container">
+    <h3 style="margin-bottom:20px; font-size:1.5rem; font-weight:700; color:var(--primary-blue);">
+      <i class="fas fa-edit" style="margin-right:10px; color:var(--primary-gold);"></i>
+      Edit Trade - {{ trade.symbol }}
+    </h3>
+
+    <div class="profile-card" 
+         style="background:#fff; border-radius:16px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.08); max-width:700px; margin:auto;">
+      
+      <form method="post">
+        {% csrf_token %}
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          {% for field in form %}
+          <div style="margin-bottom:15px;">
+            <label style="font-weight:600; color:#444;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div style="color:red; font-size:0.85rem;">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div style="margin-top:25px; text-align:center;">
+          <button type="submit" 
+                  style="padding:10px 20px; border:none; border-radius:8px; background:var(--primary-blue); color:#fff; font-weight:600; cursor:pointer;">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <a href="{% url 'customer_trade' %}" 
+             style="margin-left:15px; padding:10px 20px; border-radius:8px; background:#eee; color:#333; text-decoration:none; font-weight:600;">
+            <i class="fas fa-arrow-left"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

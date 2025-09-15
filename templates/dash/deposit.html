@@ -1,0 +1,382 @@
+{% extends 'dash/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+    <main class="main-content" id="mainContent">
+      <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" style="display:none;padding:8px;border-radius:8px;background:var(--primary-blue);color:var(--primary-gold);border:none"><i class="fas fa-bars"></i></button>
+          <div class="search-box"><i class="fas fa-search" style="color:var(--primary-gold);margin-right:10px"></i><input placeholder="Search..." /></div>
+        </div>
+        <div class="user-menu">
+          <div class="notification" id="notificationIcon"><i class="fas fa-bell"></i><span id="notifCount" class="notification-badge" style="display:none">0</span></div>
+          <div class="user-profile"><div class="user-avatar">{% if customer and customer.customer and customer.customer.full_name %}{{ customer.customer.full_name|slice:":1"|upper }}{% else %}JD{% endif %}</div>
+            <div style="display:flex;flex-direction:column;text-align:left">
+              <div style="font-weight:700">{{ request.user.username|default:"John Doe" }}</div>
+              <div style="color:var(--primary-gold);font-size:.85rem">{% if customer %}Balance: ${{ customer.balance }}{% else %}No Account{% endif %}</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="deposit-container">
+          <div class="deposit-header">
+            <h2>Deposit </h2>
+            <p>Add funds to your account using cryptocurrency</p>
+          </div>
+          
+          <div class="deposit-info">
+            <h4>How to Deposit </h4>
+            <p>To Deposit  into your Prestige Wealth account, follow these steps:</p>
+            <ul>
+              <li>Click the "Make Deposit  " button below</li>
+              <li>Select your preferred cryptocurrency</li>
+              <li>Enter the amount you wish to deposit  </li>
+              <li>Copy the wallet address at the Deposit History table</li>
+              <li>Submit the deposit  request</li>
+            </ul>
+            <p><strong>Processing Time:</strong> Deposit  s are typically credited within 24-48 hours after 3 network confirmations. If your deposit  is not credited within this timeframe, please contact our support team.</p>
+          </div>
+          
+          <div class="deposit-actions">
+            <button id="openDepositModal" class="btn-deposit">
+              <i class="fas fa-plus-circle"></i> Make Deposit  
+            </button>
+          </div>
+          
+          <div class="positions-container">
+            <h3>Deposit History</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Currency</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Wallet Address</th>
+                        <th>Status</th>
+                        <th>Transaction ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for deposit in deposits %}
+                    <tr>
+                        <td>{{ deposit.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ deposit.currency }}</td>
+                        <td>${{ deposit.amount }}</td>
+                        <td>{{ deposit.transaction_type }}</td>
+                        <td>
+                            {% if deposit.wallet_address %}
+                                <span class="wallet-short">{{ deposit.wallet_address|slice:":6" }}...{{ deposit.wallet_address|slice:"-4:" }}</span>
+                                <button class="copy-btn" data-wallet="{{ deposit.wallet_address }}" title="Copy wallet address">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            {% else %}
+                                {% if deposit.currency == 'BTC/USD'  %}
+                                    <span class="wallet-short">{{ management.btc_wallet_address|slice:":6" }}...{{ management.btc_wallet_address|slice:"-4:" }}</span>
+                                    <button class="copy-btn" data-wallet="{{ management.btc_wallet_address }}" title="Copy wallet address">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                {% elif deposit.currency == 'ETH/USD' %}
+                                    <span class="wallet-short">{{ management.eth_wallet_address|slice:":6" }}...{{ management.eth_wallet_address|slice:"-4:" }}</span>
+                                    <button class="copy-btn" data-wallet="{{ management.eth_wallet_address }}" title="Copy wallet address">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge 
+                                {% if deposit.status == 'pending' %}status-pending
+                                {% elif deposit.status == 'completed' %}status-completed
+                                {% else %}status-failed{% endif %}">
+                                {{ deposit.status|capfirst }}
+                            </span>
+                        </td>
+                        <td>{{ deposit.transaction_id|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No deposits yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy wallet address functionality
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const walletAddress = this.getAttribute('data-wallet');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(walletAddress).then(() => {
+                // Change icon to checkmark temporarily
+                const icon = this.querySelector('i');
+                const originalClass = icon.className;
+                
+                icon.className = 'fas fa-check';
+                this.style.backgroundColor = '#28a745';
+                
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    this.style.backgroundColor = '';
+                }, 2000);
+                
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy wallet address');
+            });
+        });
+    });
+});
+</script>
+
+<style>
+.copy-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: var(--primary-dark);
+}
+
+.wallet-short {
+    font-family: monospace;
+}
+</style>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- deposit  Modal -->
+    <div class="modal-overlay" id="depositModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Make a Deposit  </h3>
+          <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'trade:deposit_account' %}">
+            {% csrf_token %}
+
+            <!-- Django messages -->
+            {% if messages %}
+                <div class="messages-django">
+                {% for message in messages %}
+                    <div class="msg-item {% if message.tags %}msg-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Non-field errors (form-wide errors) -->
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.currency.id_for_label }}">Select Currency</label>
+                {{ form.currency }}
+                {% if form.currency.errors %}
+                <div class="error-text">
+                    {% for error in form.currency.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.amount.id_for_label }}">Amount (USD)</label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                <div class="error-text">
+                    {% for error in form.amount.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+
+            <div class="deposit-info" style="margin-top: 20px;">
+                <p><strong>Important:</strong> Ensure you're sending funds to the correct address. Contact support for reversed. Your deposit will be processed within <strong>24–48 hours</strong>. Contact support if not credited.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-secondary" id="cancelDeposit ">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-primary">Confirm Deposit </button>
+            </div>
+        </form>
+
+        </div>
+    </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Modal functionality
+      const depositModal = document.getElementById('depositModal');
+      const openDepositBtn = document.getElementById('openDepositModal');
+      const closeModalBtn = document.getElementById('closeModal');
+      const cancelDepositBtn = document.getElementById('cancelDeposit');
+      
+      function openModal() {
+        depositModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeModal() {
+        depositModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      openDepositBtn.addEventListener('click', openModal);
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelDepositBtn.addEventListener('click', closeModal);
+      depositModal.addEventListener('click', (e) => {
+        if (e.target === depositModal) closeModal();
+      });
+      
+      // Form validation
+      const depositForm = document.getElementById('depositForm');
+      depositForm.addEventListener('submit', (e) => {
+        const amount = document.getElementById('amount');
+        const walletAddress = document.getElementById('wallet_address');
+        const currency = document.getElementById('currency');
+        let isValid = true;
+        
+        if (!currency.value) {
+          alert('Please select a currency');
+          isValid = false;
+        } else if (!amount.value || parseFloat(amount.value) < 10) {
+          alert('Minimum deposit  amount is $10');
+          isValid = false;
+        } else if (!walletAddress.value) {
+          alert('Please provide your wallet address');
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          e.preventDefault();
+        }
+      });
+      
+      // All other existing JavaScript from the dashboard
+      const toggleSidebar = document.getElementById("toggleSidebar");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+      if (toggleSidebar) {
+        toggleSidebar.addEventListener("click", ()=>{ 
+          sidebar.classList.toggle("collapsed"); 
+          mainContent.classList.toggle("expanded"); 
+        });
+      }
+
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileOverlay = document.getElementById("mobileOverlay");
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", ()=>{ 
+          sidebar.classList.toggle("active"); 
+          mobileOverlay.classList.toggle("active"); 
+          document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : ""; 
+        });
+      }
+      
+      if (mobileOverlay) {
+        mobileOverlay.addEventListener("click", ()=>{ 
+          sidebar.classList.remove("active"); 
+          mobileOverlay.classList.remove("active"); 
+          document.body.style.overflow = ""; 
+        });
+      }
+
+      // Chat functionality
+      const chatBtn = document.getElementById("chatBtn");
+      const chatWindow = document.getElementById("chatWindow");
+      const chatClose = document.getElementById("chatClose");
+      const chatSend = document.getElementById("chatSend");
+      const chatInput = document.getElementById("chatInput");
+      const chatMessages = document.getElementById("chatMessages");
+      
+      function appendMessage(text, cls){ 
+        const el=document.createElement("div"); 
+        el.className="message "+cls; 
+        el.textContent=text; 
+        chatMessages.appendChild(el); 
+        chatMessages.scrollTop = chatMessages.scrollHeight; 
+      }
+      
+      if (chatBtn && chatWindow) {
+        chatBtn.addEventListener("click", ()=>{ 
+          chatWindow.classList.toggle("active"); 
+          chatWindow.setAttribute("aria-hidden", !chatWindow.classList.contains("active")); 
+          if (chatWindow.classList.contains("active")) {
+            chatInput.focus(); 
+          }
+        });
+      }
+      
+      if (chatClose) {
+        chatClose.addEventListener("click", ()=>{ 
+          chatWindow.classList.remove("active"); 
+          chatWindow.setAttribute("aria-hidden","true"); 
+        });
+      }
+      
+      if (chatSend && chatInput) {
+        chatSend.addEventListener("click",(e)=>{ 
+          e.preventDefault(); 
+          const msg=chatInput.value.trim(); 
+          if(!msg) return; 
+          appendMessage(msg,"user"); 
+          chatInput.value=""; 
+          setTimeout(()=>{ 
+            appendMessage("Support: Thanks for your message. Our team will respond shortly.", "support"); 
+          }, 700); 
+        });
+      }
+
+      document.addEventListener("keydown",(e)=>{ 
+        if(e.key==="Enter" && (document.activeElement===chatInput)){ 
+          e.preventDefault(); 
+          if (chatSend) chatSend.click(); 
+        } 
+      });
+
+      window.addEventListener("resize", ()=>{ 
+        if(window.innerWidth <= 992){ 
+          sidebar.classList.remove("collapsed"); 
+          mainContent.classList.remove("expanded"); 
+          if(!sidebar.classList.contains("active")) sidebar.style.transform = "translateX(-100%)"; 
+        } else { 
+          sidebar.style.transform = "translateX(0)"; 
+          if (mobileOverlay) mobileOverlay.classList.remove("active"); 
+          document.body.style.overflow = ""; 
+        } 
+      });
+    });
+  </script>
+
+{% endblock content %}
