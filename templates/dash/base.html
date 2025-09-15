@@ -353,6 +353,7 @@
 
 
 </head>
+
 <body>
   <div class="dashboard-container">
     <aside class="sidebar" id="sidebar">
@@ -367,10 +368,8 @@
           <li><a href="{% url 'trade:wallet' %}"><i class="fas fa-wallet"></i><span class="menu-text">Wallet</span></a></li>
           <li><a href="{% url 'trade:deposit_account' %}"><i class="fas fa-money-bill-wave"></i><span class="menu-text">Deposit</span></a></li>
           <li><a href="{% url 'trade:withdraw_fund' %}"><i class="fas fa-hand-holding-usd"></i><span class="menu-text">Withdrawal</span></a></li>
-     
           <li><a href="{% url 'trade:hero' %}"><i class="fas fa-gem"></i><span class="menu-text">Investment Plans</span></a></li>
-         
-          <li><a href="{% url 'trade:customer_support' %}"><i class="fas fa-headset"></i><span class="menu-text">Support</span></a></li>
+          <li><a href="##"><i class="fas fa-headset"></i><span class="menu-text">Support</span></a></li>
           <li><a href="{% url 'trade:profile_view' %}"><i class="fas fa-cog"></i><span class="menu-text">Settings</span></a></li>
           <li><a href="{% url 'accounts:logout_view' %}"><i class="fas fa-sign-out-alt"></i><span class="menu-text">Logout</span></a></li>
         </ul>
@@ -378,272 +377,254 @@
     </aside>
 
     <div class="mobile-overlay" id="mobileOverlay"></div>
-
-    {% block content %}
-
-    {% endblock content %}
+    {% block content %}{% endblock content %}
     
     <div class="support-chat">
-      <div id="chatBtn" class="chat-btn" aria-label="Open chat"><i class="fas fa-headset"></i></div>
-      <div id="chatWindow" class="chat-window" role="dialog" aria-hidden="true">
-        <div class="chat-header"><div>Customer Support</div><div id="chatClose" style="cursor:pointer"><i class="fas fa-times"></i></div></div>
-        <div id="chatMessages" class="chat-messages">
-          <div class="message support">{{support_msg.content}}</div>
+      <div id="chatBtn" class="chat-btn"><i class="fas fa-headset"></i></div>
+      <div id="chatWindow" class="chat-window" aria-hidden="true">
+        <div class="chat-header">
+          <div>Customer Support</div>
+          <div id="chatClose"><i class="fas fa-times"></i></div>
         </div>
-        
+        <div id="chatMessages" class="chat-messages"></div>
         <div class="chat-input">
-          <input id="chatInput" placeholder="Type your message..." aria-label="Chat input"/>
-          <input style="display: inline-block; width: 10px;" type="file" name="" id="">
+          <button id="emojiBtn"><i class="fas fa-smile"></i></button>
+          <div id="emojiPicker" class="emoji-picker" style="display:none"></div>
+          <input id="chatInput" placeholder="Type your message..."/>
+          <input type="file" id="chatFile" style="display:none"/>
+          <button id="fileBtn"><i class="fas fa-paperclip"></i></button>
           <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <div class="chat-footer">
+          <a href="{% url 'trade:support_dashboard' %}" class="return-btn">Return</a>
         </div>
       </div>
     </div>
 
-    <div id="notificationToast" class="notification-toast" role="status" aria-live="polite">
+    <div id="notificationToast" class="notification-toast">
       <div class="notification-icon"><i class="fas fa-coins"></i></div>
       <div class="notification-content">
         <div class="notification-title" id="notifyTitle">Notification</div>
         <div class="notification-message" id="toastMessage">Sample message</div>
       </div>
-      <button id="toastClose" class="notification-close" aria-label="Close notification"><i class="fas fa-times"></i></button>
+      <button id="toastClose" class="notification-close"><i class="fas fa-times"></i></button>
     </div>
-
   </div>
 
   <script src="https://s3.tradingview.com/tv.js"></script>
   <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // ======= TradingView Widget =======
-  let tvWidget = null;
-  const initTradingView = (symbol = "BINANCE:BTCUSDT", interval = "60") => {
-    try { if(tvWidget) tvWidget.remove(); } catch(e){}
-    tvWidget = new TradingView.widget({
-      autosize: true,
-      symbol,
-      interval,
-      timezone: "Etc/UTC",
-      theme: "light",
-      style: "1",
-      locale: "en",
-      toolbar_bg: "#f1f3f6",
-      container_id: "tradingview_chart",
-      studies: ["RSI@tv-basicstudies","MACD@tv-basicstudies"]
+  let tvWidget=null;
+  const initTradingView=(symbol="BINANCE:BTCUSDT",interval="60")=>{
+    try{if(tvWidget)tvWidget.remove()}catch(e){}
+    tvWidget=new TradingView.widget({
+      autosize:true,symbol,interval,timezone:"Etc/UTC",theme:"light",style:"1",
+      locale:"en",toolbar_bg:"#f1f3f6",container_id:"tradingview_chart",
+      studies:["RSI@tv-basicstudies","MACD@tv-basicstudies"]
     });
   };
   initTradingView();
-
-  // ======= Timeframe & Symbol Selection =======
-  const timeframeBtns = document.querySelectorAll(".timeframe-btn");
-  const symbolSelect = document.getElementById("symbolSelect");
-
-  timeframeBtns.forEach(btn => {
-    btn.addEventListener("click", function() {
-      timeframeBtns.forEach(b => b.classList.remove("active"));
+  const timeframeBtns=document.querySelectorAll(".timeframe-btn");
+  const symbolSelect=document.getElementById("symbolSelect");
+  timeframeBtns.forEach(btn=>{
+    btn.addEventListener("click",function(){
+      timeframeBtns.forEach(b=>b.classList.remove("active"));
       this.classList.add("active");
-      initTradingView(symbolSelect.value, this.dataset.timeframe);
+      initTradingView(symbolSelect.value,this.dataset.timeframe);
     });
   });
-
-  symbolSelect?.addEventListener("change", () => {
-    const active = document.querySelector(".timeframe-btn.active");
-    initTradingView(symbolSelect.value, active?.dataset.timeframe || "60");
+  symbolSelect?.addEventListener("change",()=>{
+    const active=document.querySelector(".timeframe-btn.active");
+    initTradingView(symbolSelect.value,active?.dataset.timeframe||"60");
   });
-
-  // ======= Sidebar & Mobile Menu =======
-  const sidebar = document.getElementById("sidebar");
-  const mainContent = document.getElementById("mainContent");
-  const toggleSidebar = document.getElementById("toggleSidebar");
-  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-  const mobileOverlay = document.getElementById("mobileOverlay");
-
-  toggleSidebar?.addEventListener("click", () => {
+  const sidebar=document.getElementById("sidebar");
+  const mainContent=document.getElementById("mainContent");
+  const toggleSidebar=document.getElementById("toggleSidebar");
+  const mobileMenuBtn=document.getElementById("mobileMenuBtn");
+  const mobileOverlay=document.getElementById("mobileOverlay");
+  toggleSidebar?.addEventListener("click",()=>{
     sidebar.classList.toggle("collapsed");
-    mainContent.classList.toggle("expanded");
+    mainContent?.classList.toggle("expanded");
   });
-
-  mobileMenuBtn?.addEventListener("click", () => {
+  mobileMenuBtn?.addEventListener("click",()=>{
     sidebar.classList.toggle("active");
     mobileOverlay?.classList.toggle("active");
-    document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : "";
+    document.body.style.overflow=sidebar.classList.contains("active")?"hidden":"";
   });
-
-  mobileOverlay?.addEventListener("click", () => {
+  mobileOverlay?.addEventListener("click",()=>{
     sidebar.classList.remove("active");
     mobileOverlay.classList.remove("active");
-    document.body.style.overflow = "";
+    document.body.style.overflow="";
   });
-
-  window.addEventListener("resize", () => {
-    if(window.innerWidth <= 992){
+  window.addEventListener("resize",()=>{
+    if(window.innerWidth<=992){
       sidebar.classList.remove("collapsed");
-      mainContent.classList.remove("expanded");
-      sidebar.style.transform = sidebar.classList.contains("active") ? "translateX(0)" : "translateX(-100%)";
-    } else {
-      sidebar.style.transform = "translateX(0)";
+      mainContent?.classList.remove("expanded");
+      sidebar.style.transform=sidebar.classList.contains("active")?"translateX(0)":"translateX(-100%)";
+    }else{
+      sidebar.style.transform="translateX(0)";
       mobileOverlay?.classList.remove("active");
-      document.body.style.overflow = "";
+      document.body.style.overflow="";
     }
   });
-
-  // ======= Buy/Sell Buttons =======
-  const buyBtn = document.getElementById("buyBtn");
-  const sellBtn = document.getElementById("sellBtn");
-  const setTradeType = type => {
-    const hiddenInput = document.querySelector('[name="trade_type"]');
-    if(hiddenInput) hiddenInput.value = type;
-    buyBtn?.classList.toggle("active", type==="buy");
-    sellBtn?.classList.toggle("active", type==="sell");
+  const buyBtn=document.getElementById("buyBtn");
+  const sellBtn=document.getElementById("sellBtn");
+  const setTradeType=type=>{
+    const hiddenInput=document.querySelector('[name="trade_type"]');
+    if(hiddenInput)hiddenInput.value=type;
+    buyBtn?.classList.toggle("active",type==="buy");
+    sellBtn?.classList.toggle("active",type==="sell");
   };
-  buyBtn?.addEventListener("click", () => setTradeType("buy"));
-  sellBtn?.addEventListener("click", () => setTradeType("sell"));
-  setTradeType(document.querySelector('[name="trade_type"]')?.value || "buy");
-
-  // ======= Trade Form Validation =======
-  const tradeForm = document.getElementById("tradeForm");
-  tradeForm?.addEventListener("submit", e => {
-    const symbolEl = tradeForm.querySelector('[name="symbol"], #id_symbol, select[name="symbol"]');
-    const amountEl = tradeForm.querySelector('[name="amount"], #id_amount');
-    const errors = [];
-    if(!symbolEl?.value) errors.push("Symbol is required");
-    if(!amountEl?.value || isNaN(parseFloat(amountEl.value)) || parseFloat(amountEl.value) <= 0)
-      errors.push("Enter a valid amount > 0");
-
+  buyBtn?.addEventListener("click",()=>setTradeType("buy"));
+  sellBtn?.addEventListener("click",()=>setTradeType("sell"));
+  setTradeType(document.querySelector('[name="trade_type"]')?.value||"buy");
+  const tradeForm=document.getElementById("tradeForm");
+  tradeForm?.addEventListener("submit",e=>{
+    const symbolEl=tradeForm.querySelector('[name="symbol"],#id_symbol,select[name="symbol"]');
+    const amountEl=tradeForm.querySelector('[name="amount"],#id_amount');
+    const errors=[];
+    if(!symbolEl?.value)errors.push("Symbol is required");
+    if(!amountEl?.value||isNaN(parseFloat(amountEl.value))||parseFloat(amountEl.value)<=0)errors.push("Enter a valid amount > 0");
     if(errors.length){
       e.preventDefault();
-      const container = document.createElement("div");
-      container.className = "messages-django";
+      const container=document.createElement("div");
+      container.className="messages-django";
       errors.forEach(err=>{
-        const div = document.createElement("div");
-        div.className = "msg-item msg-error";
-        div.textContent = err;
+        const div=document.createElement("div");
+        div.className="msg-item msg-error";
+        div.textContent=err;
         container.appendChild(div);
       });
       tradeForm.parentNode.querySelector(".messages-django")?.remove();
-      tradeForm.parentNode.insertBefore(container, tradeForm.parentNode.firstChild);
-      window.scrollTo({top:0, behavior:"smooth"});
+      tradeForm.parentNode.insertBefore(container,tradeForm.parentNode.firstChild);
+      window.scrollTo({top:0,behavior:"smooth"});
     }
   });
-
-  document.querySelectorAll(".close-trade-form").forEach(f => {
-    f.addEventListener("submit", ev => {
-      if(!confirm("Close this position?")) ev.preventDefault();
-    });
+  document.querySelectorAll(".close-trade-form").forEach(f=>{
+    f.addEventListener("submit",ev=>{if(!confirm("Close this position?"))ev.preventDefault()});
   });
-
-  // ======= Chat Widget =======
-  const chatBtn = document.getElementById("chatBtn");
-  const chatWindow = document.getElementById("chatWindow");
-  const chatClose = document.getElementById("chatClose");
-  const chatSend = document.getElementById("chatSend");
-  const chatInput = document.getElementById("chatInput");
-  const chatMessages = document.getElementById("chatMessages");
-
-  const appendMessage = (text, cls) => {
-    const div = document.createElement("div");
-    div.className = "message " + cls;
-    div.textContent = text;
+  const chatBtn=document.getElementById("chatBtn");
+  const chatWindow=document.getElementById("chatWindow");
+  const chatClose=document.getElementById("chatClose");
+  const chatSend=document.getElementById("chatSend");
+  const chatInput=document.getElementById("chatInput");
+  const chatMessages=document.getElementById("chatMessages");
+  const fileBtn=document.getElementById("fileBtn");
+  const chatFile=document.getElementById("chatFile");
+  const emojiBtn=document.getElementById("emojiBtn");
+  const emojiPicker=document.getElementById("emojiPicker");
+  const emojis=["😀","😂","😍","😎","👍","🙏","🔥","💯","🎉"];
+  emojis.forEach(e=>{
+    const span=document.createElement("span");
+    span.textContent=e;
+    span.className="emoji";
+    span.style.cursor="pointer";
+    span.style.padding="5px";
+    span.addEventListener("click",()=>{chatInput.value+=e;emojiPicker.style.display="none"});
+    emojiPicker.appendChild(span);
+  });
+  emojiBtn?.addEventListener("click",e=>{
+    e.preventDefault();
+    emojiPicker.style.display=emojiPicker.style.display==="none"?"block":"none";
+  });
+  const appendMessage=(content,cls,isFile=false)=>{
+    const div=document.createElement("div");
+    div.className="message "+cls;
+    if(isFile){
+      if(/\.(jpg|jpeg|png|gif|webp)$/i.test(content)){
+        div.innerHTML=`<img src="${content}" class="chat-image" alt="Image"/>`;
+      }else{
+        div.innerHTML=`<a href="${content}" target="_blank">File</a>`;
+      }
+    }else{
+      div.textContent=content;
+    }
     chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.scrollTop=chatMessages.scrollHeight;
   };
-
-  const getCookie = name => {
-    let cookieValue = null;
-    if(document.cookie && document.cookie !== ""){
-      document.cookie.split(";").forEach(cookie => {
-        cookie = cookie.trim();
-        if(cookie.startsWith(name + "=")) cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+  const getCookie=name=>{
+    let cookieValue=null;
+    if(document.cookie&&document.cookie!==""){
+      document.cookie.split(";").forEach(cookie=>{
+        cookie=cookie.trim();
+        if(cookie.startsWith(name+"="))cookieValue=decodeURIComponent(cookie.slice(name.length+1));
       });
     }
     return cookieValue;
   };
-
-  const sendMessageToBackend = async (message) => {
+  const sendMessageToBackend=async(message,file=null)=>{
     try{
-      const res = await fetch("/send-chat/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken")
-        },
-        body: JSON.stringify({ message })
+      const formData=new FormData();
+      formData.append("message",message);
+      if(file)formData.append("file",file);
+      const res=await fetch("/send-chat/",{
+        method:"POST",
+        headers:{"X-CSRFToken":getCookie("csrftoken")},
+        body:formData
       });
-      const data = await res.json();
+      const data=await res.json();
       if(data.success){
-        if(data.support_message) appendMessage(data.support_message.content, "support");
-      } else appendMessage("Error sending message.", "system");
-    } catch(e){
-      console.error(e);
-      appendMessage("Failed to send message.", "system");
-    }
+        if(data.file_url)appendMessage(data.file_url,"user",true);
+        if(data.support_message)appendMessage(data.support_message.content,"support");
+      }else appendMessage("Error sending message.","system");
+    }catch(e){appendMessage("Failed to send message.","system")}
   };
-
-  chatBtn?.addEventListener("click", () => {
+  chatBtn?.addEventListener("click",()=>{
     chatWindow.classList.toggle("active");
-    chatWindow.setAttribute("aria-hidden", !chatWindow.classList.contains("active"));
+    chatWindow.setAttribute("aria-hidden",!chatWindow.classList.contains("active"));
     chatInput?.focus();
   });
-
-  chatClose?.addEventListener("click", () => {
+  chatClose?.addEventListener("click",()=>{
     chatWindow.classList.remove("active");
     chatWindow.setAttribute("aria-hidden","true");
   });
-
-  chatSend?.addEventListener("click", e => {
+  chatSend?.addEventListener("click",e=>{
     e.preventDefault();
-    const msg = chatInput.value.trim();
-    if(!msg) return;
-    appendMessage(msg, "user");
-    chatInput.value = "";
-    sendMessageToBackend(msg);
+    const msg=chatInput.value.trim();
+    const file=chatFile.files[0];
+    if(!msg&&!file)return;
+    if(msg)appendMessage(msg,"user");
+    chatInput.value="";
+    sendMessageToBackend(msg,file);
+    chatFile.value="";
   });
-
-  chatInput?.addEventListener("keydown", e => {
-    if(e.key === "Enter"){
-      e.preventDefault();
-      chatSend.click();
-    }
+  chatInput?.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){e.preventDefault();chatSend.click()}
   });
-
-  // ======= Notifications =======
-  const notif = document.getElementById("notificationToast");
-  const toastMessage = document.getElementById("toastMessage");
-  const toastTitle = document.getElementById("notifyTitle");
-  const toastClose = document.getElementById("toastClose");
-  const notifCount = document.getElementById("notifCount");
-  const withdrawalMessages = [
-    "User Michael Rodriguez withdrew $3,200.00",
-    "User Sarah Chen withdrew $1,850.00",
-    "User Robert Wellington withdrew $5,500.00",
-    "User Emma Thompson withdrew $2,100.00",
+  fileBtn?.addEventListener("click",()=>chatFile.click());
+  const notif=document.getElementById("notificationToast");
+  const toastMessage=document.getElementById("toastMessage");
+  const toastTitle=document.getElementById("notifyTitle");
+  const toastClose=document.getElementById("toastClose");
+  const notifCount=document.getElementById("notifCount");
+  const withdrawalMessages=[
+    "User Michael Rodriguez withdrew $3,200.00","User Sarah Chen withdrew $1,850.00",
+    "User Robert Wellington withdrew $5,500.00","User Emma Thompson withdrew $2,100.00",
     "User Alex Johnson withdrew $4,300.00"
   ];
-
-  const showNotification = (msg, title="Notice") => {
-    toastMessage.textContent = msg;
-    toastTitle.textContent = title;
+  const showNotification=(msg,title="Notice")=>{
+    toastMessage.textContent=msg;
+    toastTitle.textContent=title;
     notif?.classList.add("show");
-    try { new Audio("https://assets.mixkit.co/sfx/preview/mixkit-retro-game-emergency-alarm-1000.mp3").play().catch(()=>{}); } catch(e){}
-    setTimeout(()=>notif?.classList.remove("show"), 5000);
-    if(notifCount) {
-      notifCount.textContent = (parseInt(notifCount.textContent||"0",10)+1);
-      notifCount.style.display = "inline-flex";
+    try{new Audio("https://assets.mixkit.co/sfx/preview/mixkit-retro-game-emergency-alarm-1000.mp3").play().catch(()=>{})}catch(e){}
+    setTimeout(()=>notif?.classList.remove("show"),5000);
+    if(notifCount){
+      notifCount.textContent=(parseInt(notifCount.textContent||"0",10)+1);
+      notifCount.style.display="inline-flex";
     }
   };
-
-  toastClose?.addEventListener("click", () => notif?.classList.remove("show"));
-
-  setInterval(() => {
-    const msg = withdrawalMessages[Math.floor(Math.random()*withdrawalMessages.length)];
+  toastClose?.addEventListener("click",()=>notif?.classList.remove("show"));
+  setInterval(()=>{
+    const msg=withdrawalMessages[Math.floor(Math.random()*withdrawalMessages.length)];
     showNotification(msg,"Withdrawal Processed");
-  }, 125000);
-
-  setTimeout(() => {
-    const msg = withdrawalMessages[Math.floor(Math.random()*withdrawalMessages.length)];
+  },125000);
+  setTimeout(()=>{
+    const msg=withdrawalMessages[Math.floor(Math.random()*withdrawalMessages.length)];
     showNotification(msg,"Withdrawal Processed");
-  }, 2000);
+  },2000);
 });
-</script>
-
-
+  </script>
 </body>
+
+
 </html>

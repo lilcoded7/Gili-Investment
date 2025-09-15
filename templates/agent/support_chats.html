@@ -513,6 +513,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="chat-container">
         <div class="sidebar">
@@ -535,9 +536,9 @@
             <div class="customers-list">
                 {% for customer in customers %}
                 <div class="customer-item" data-customer-id="{{ customer.id }}">
-                    <div class="customer-avatar">{{ customer.name|slice:":2"|upper }}</div>
+                    <div class="customer-avatar">{{ customer.full_name|slice:":2"|upper }}</div>
                     <div class="customer-info">
-                        <h4>{{ customer.name }}</h4>
+                        <h4>{{ customer.full_name }}</h4>
                         <p>{{ customer.conversation_set.last.messages.last.content|default:"" }}</p>
                     </div>
                     <div class="customer-meta">
@@ -564,6 +565,9 @@
                     </div>
                 </div>
                 <div class="chat-actions">
+                    <a href="{% url 'trade:prestige_wealth' %}" class="return-button">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
                     <button><i class="fas fa-phone-alt"></i></button>
                     <button><i class="fas fa-video"></i></button>
                     <button><i class="fas fa-user-circle"></i></button>
@@ -571,10 +575,14 @@
             </div>
             <div class="messages-container"></div>
             <div class="input-area">
-                <button><i class="far fa-smile"></i></button>
-                <button><i class="fas fa-paperclip"></i></button>
+                <button class="emoji-button"><i class="far fa-smile"></i></button>
+                <button class="file-button"><i class="fas fa-paperclip"></i></button>
+                <input type="file" class="file-input" style="display:none;" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx">
                 <input type="text" class="message-input" placeholder="Type a message...">
                 <button class="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="emoji-picker" style="display:none; position:absolute; bottom:60px; left:20px; background:#fff; border:1px solid #ccc; padding:8px; border-radius:10px; max-width:250px; flex-wrap:wrap; display:flex; gap:5px; font-size:20px;">
+                <span>💰</span><span>📈</span><span>📉</span><span>💸</span><span>🏦</span><span>🪙</span><span>🚀</span><span>🔥</span><span>💎</span><span>🤝</span><span>🏆</span><span>🤑</span><span>⚡</span><span>💳</span><span>🌍</span>
             </div>
         </div>
     </div>
@@ -587,6 +595,10 @@
         const messageInput = document.querySelector('.message-input')
         const sendButton = document.querySelector('.send-button')
         const messagesContainer = document.querySelector('.messages-container')
+        const fileButton = document.querySelector(".file-button")
+        const fileInput = document.querySelector(".file-input")
+        const emojiButton = document.querySelector(".emoji-button")
+        const emojiPicker = document.querySelector(".emoji-picker")
 
         function getCookie(name) {
             let cookieValue = null
@@ -626,8 +638,12 @@
                         const messageElement = document.createElement('div')
                         messageElement.classList.add('message', msg.sender_type === "support" ? "sent" : "received")
                         let contentHTML = ""
-                        if (msg.message_type === "file") {
-                            contentHTML = `<a href="${msg.file_url}" target="_blank">${msg.filename}</a>`
+                        if (msg.message_type === "file" && msg.file_url) {
+                            if (msg.file_url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                                contentHTML = `<img src="${msg.file_url}" alt="Image" style="max-width:150px; border-radius:10px;">`
+                            } else {
+                                contentHTML = `<a href="${msg.file_url}" target="_blank">${msg.filename}</a>`
+                            }
                         } else {
                             contentHTML = msg.content
                         }
@@ -644,39 +660,40 @@
                 })
         }
 
-        function sendMessage() {
-            const messageText = messageInput.value.trim()
-            if (!messageText || !currentConversationId) return
+        function appendMessage(content, timestamp) {
+            const messageElement = document.createElement("div")
+            messageElement.classList.add("message", "sent")
+            messageElement.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${content}</div>
+                    <div class="message-time">${timestamp}</div>
+                </div>
+                <div class="message-avatar">SA</div>
+            `
+            messagesContainer.appendChild(messageElement)
+            messagesContainer.scrollTop = messagesContainer.scrollHeight
+        }
+
+        function sendMessage(content) {
+            if (!content || !currentConversationId) return
             const formData = new FormData()
             formData.append("conversation_id", currentConversationId)
-            formData.append("content", messageText)
+            formData.append("content", content)
             fetch("/support/send_message/", {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
-                },
+                headers: { "X-CSRFToken": getCookie("csrftoken") },
                 body: formData
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    const messageElement = document.createElement("div")
-                    messageElement.classList.add("message", "sent")
-                    messageElement.innerHTML = `
-                        <div class="message-content">
-                            <div class="message-text">${messageText}</div>
-                            <div class="message-time">${data.timestamp}</div>
-                        </div>
-                        <div class="message-avatar">SA</div>
-                    `
-                    messagesContainer.appendChild(messageElement)
+                    appendMessage(content, data.timestamp)
                     messageInput.value = ""
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight
                 }
             })
         }
 
-        toggleSidebar.addEventListener('click', function() {
+        toggleSidebar.addEventListener('click', () => {
             sidebar.classList.toggle('active')
         })
 
@@ -686,17 +703,60 @@
                 this.classList.add("active")
                 const customerId = this.getAttribute("data-customer-id")
                 loadConversation(customerId)
-                if (window.innerWidth < 993) {
-                    sidebar.classList.remove("active")
-                }
+                if (window.innerWidth < 993) sidebar.classList.remove("active")
             })
         })
 
-        sendButton.addEventListener('click', sendMessage)
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage()
+        sendButton.addEventListener('click', () => {
+            sendMessage(messageInput.value.trim())
+        })
+
+        messageInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage(messageInput.value.trim())
+        })
+
+        fileButton.addEventListener("click", () => fileInput.click())
+
+        fileInput.addEventListener("change", () => {
+            if (!currentConversationId || fileInput.files.length === 0) return
+            const file = fileInput.files[0]
+            const formData = new FormData()
+            formData.append("conversation_id", currentConversationId)
+            formData.append("file", file)
+            fetch("/support/send_message/", {
+                method: "POST",
+                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    let contentHTML = ""
+                    if (data.file_url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                        contentHTML = `<img src="${data.file_url}" alt="Image" style="max-width:150px; border-radius:10px;">`
+                    } else {
+                        contentHTML = `<a href="${data.file_url}" target="_blank">${data.filename}</a>`
+                    }
+                    appendMessage(contentHTML, data.timestamp)
+                }
+            })
+            fileInput.value = ""
+        })
+
+        emojiButton.addEventListener("click", () => {
+            emojiPicker.style.display = emojiPicker.style.display === "none" ? "flex" : "none"
+        })
+
+        emojiPicker.addEventListener("click", e => {
+            if (e.target.tagName === "SPAN") {
+                messageInput.value += e.target.textContent
+                messageInput.focus()
+            }
         })
     </script>
 </body>
+
+
+
 
 </html>

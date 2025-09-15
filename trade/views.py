@@ -42,25 +42,25 @@ def customer_dashboard(request):
     form = TradeForm(request.POST or None)
     open_trades = Trade.objects.filter()
     customer_account = Account.objects.filter(customer__user=request.user).first()
-    sessions = ChatSession.objects.filter(
-        status="open", customer__user=request.user
-    ).order_by("-started_at")
 
-    active_session = sessions.first()
-    chat_messages = []
-    if active_session:
-        chat_messages = Message.objects.filter(chat=active_session).order_by(
-            "timestamp"
-        )
+    if request.user.is_admin:
+        return redirect('trade:prestige_wealth')
+
+    from django.template import TemplateDoesNotExist
+    from django.template.loader import get_template
+
+    try:
+        print(get_template("agent/dash.html"))
+    except TemplateDoesNotExist:
+        raise Exception("Template not found!")
+
 
     context = {
         "form": form,
         "open_trades": open_trades,
         "customer": customer_account,
-        "sessions": sessions,
-        "chat_messages": chat_messages,
     }
-    return render(request, "dash/customer_dashboard.html", context)
+    return render(request, "main/customer_dashboard.html", context)
 
 
 @login_required
@@ -268,113 +268,10 @@ def profile_view(request):
     return render(request, "dash/customer_profile.html", context)
 
 
-@login_required
-def update_profile(request):
-    if request.method == "POST":
-        customer = get_object_or_404(Customer, user=request.user)
-
-        customer.full_name = request.POST.get("full_name", "")
-        customer.phone = request.POST.get("phone", "")
-        customer.country = request.POST.get("country", "")
-        customer.address = request.POST.get("address", "")
-        customer.save()
-
-        user = request.user
-        user.email = request.POST.get("email", "")
-        user.save()
-
-        messages.success(request, "Profile updated successfully!")
-        return redirect("profile")
-
-    return redirect("profile")
-
-
-@csrf_exempt
-def send_chat(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
-
-    if not request.user.is_authenticated:
-        return JsonResponse({"error": "Authentication required"}, status=403)
-
-    customer = Customer.objects.filter(user=request.user).first()
-    if not customer:
-        return JsonResponse({"error": "Customer not found"}, status=404)
-
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-    message_text = data.get("message")
-    if not message_text:
-        return JsonResponse({"error": "Message is required"}, status=400)
-
-    # Find or create a chat session
-    chat, created = ChatSession.objects.get_or_create(
-        customer=customer,
-        agent=customer.agent,
-        status="open",
-        defaults={"started_at": now()},
-    )
-
-    # Save customer's message
-    customer_msg = Message.objects.create(
-        chat=chat,
-        sender="customer",
-        content=message_text,
-    )
-
-    # Optional: fetch latest agent reply if exists
-    support_msg = Message.objects.filter(chat=chat, sender="agent").last()
-
-    return JsonResponse(
-        {
-            "success": True,
-            "chat_id": chat.id,
-            "customer_message": {
-                "id": customer_msg.id,
-                "content": customer_msg.content,
-                "sender": customer_msg.sender,
-                "timestamp": customer_msg.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            },
-            "support_message": (
-                {
-                    "id": support_msg.id,
-                    "content": support_msg.content,
-                    "sender": support_msg.sender,
-                    "timestamp": support_msg.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                }
-                if support_msg
-                else None
-            ),
-        }
-    )
 
 
 @login_required
-def customer_support(request):
-    customer = get_object_or_404(Customer, user=request.user)
-
-    sessions = ChatSession.objects.filter(customer=customer).order_by("-started_at")
-
-    session_and_chat_conversation = [
-        {
-            "chat": chat_session,
-            "messages": Message.objects.filter(chat=chat_session).order_by("timestamp"),
-        }
-        for chat_session in sessions
-    ]
-
-    context = {
-        "sessions": session_and_chat_conversation,
-        "customer": customer,
-    }
-    return render(request, "dash/chat.html", context)
-
-
-@login_required
-def dash_admin_support(request):
+def prestige_wealth(request):
 
     trades = Trade.objects.filter(status="open")
     deposits = Transaction.objects.filter(transaction_type="deposit")
@@ -403,7 +300,7 @@ def dash_admin_support(request):
         "total_trades": total_trades,
         "pending_withdrawals": pending_withdrawals,
     }
-    return render(request, "dash_admin/dash.html", context)
+    return render(request, "agent/dash.html", context)
 
 
 @login_required
@@ -431,7 +328,7 @@ def customers(request):
     context = {
         "customers": customer_data,
     }
-    return render(request, "dash_admin/customers.html", context)
+    return render(request, "agent/customers.html", context)
 
 
 @login_required
@@ -442,13 +339,13 @@ def customer_detail(request, customer_id):
         "customer": customer,
         "account": account,
     }
-    return render(request, "dash_admin/customer_details.html", context)
+    return render(request, "agent/customer_details.html", context)
 
 
 @login_required
 def customer_trade(request):
 
-    return render(request, "dash_admin/trades.html")
+    return render(request, "agent/trades.html")
 
 
 @login_required
@@ -462,13 +359,13 @@ def edit_trade(request, trade_id):
     else:
         form = TradeForm(instance=trade)
 
-    return render(request, "dash_admin/edit_trade.html", {"form": form, "trade": trade})
+    return render(request, "agent/edit_trade.html", {"form": form, "trade": trade})
 
 
 @login_required
 def transactions(request):
     txns = Transaction.objects.select_related("customer").all().order_by("-created_at")
-    return render(request, "dash_admin/transactions.html", {"transactions": txns})
+    return render(request, "agent/transactions.html", {"transactions": txns})
 
 
 
@@ -485,7 +382,7 @@ def support_chat_dashboard(request):
         conversation__is_active=True
     ).distinct()
 
-    return render(request, "dash_admin/support_chats.html", {
+    return render(request, "agent/support_chats.html", {
         "support_agent": support_agent,
         "customers": customers,
     })
@@ -590,3 +487,72 @@ def close_conversation(request, conversation_id):
     conversation.is_active = False
     conversation.save()
     return JsonResponse({"success": True})
+
+
+@login_required
+@csrf_exempt
+def send_customer_message(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+    customer = Customer.objects.filter(user=request.user).first()
+    if not customer or not customer.agent:
+        return JsonResponse({"success": False, "error": "No assigned agent"}, status=400)
+
+    support_agent = SupportAgent.objects.filter(user=customer.agent).first()
+
+    conversation, _ = Conversation.objects.get_or_create(
+        customer=customer, support_agent=support_agent
+    )
+
+    content = request.POST.get("message", "")
+    uploaded_file = request.FILES.get("file")
+
+    if not content and not uploaded_file:
+        return JsonResponse({"success": False, "error": "Empty message"}, status=400)
+
+    msg_type = "file" if uploaded_file else "text"
+
+    msg = Message.objects.create(
+        conversation=conversation,
+        sender_type="customer",
+        content=content if msg_type == "text" else "",
+        message_type=msg_type,
+        timestamp=timezone.now()
+    )
+
+    if uploaded_file:
+        msg.file.save(uploaded_file.name, uploaded_file, save=True)
+
+    return JsonResponse({
+        "success": True,
+        "message_id": msg.id,
+        "timestamp": msg.timestamp.strftime("%H:%M"),
+        "file_url": msg.file.url if msg_type == "file" else None,
+        "content": msg.content
+    })
+
+
+
+@login_required
+def get_customer_conversation(request):
+    customer = Customer.objects.filter(user=request.user).first()
+    if not customer or not customer.agent:
+        return JsonResponse({"success": False, "error": "No assigned agent"}, status=400)
+
+    support_agent = SupportAgent.objects.filter(user=customer.agent).first()
+    conversation, _ = Conversation.objects.get_or_create(
+        customer=customer, support_agent=support_agent
+    )
+
+    messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+    data = []
+    for m in messages:
+        data.append({
+            "id": m.id,
+            "sender_type": m.sender_type,
+            "content": m.content,
+            "file_url": m.file.url if m.message_type == "file" and m.file else None,
+            "timestamp": m.timestamp.strftime("%H:%M"),
+        })
+    return JsonResponse({"success": True, "messages": data})
