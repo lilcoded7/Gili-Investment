@@ -8,7 +8,6 @@ urlpatterns = [
     path("", hero, name="hero"),
     path("about/", about, name="about"),
     path("customers/dashboard/", customer_dashboard, name="customer_dashboard"),
-    path("chat/upload/<uuid:chat_id>/", upload_file, name="upload_file"),
     path("trade/", execute_trade, name="execute_trade"),
     path("deposit/account/", deposit_account, name="deposit_account"),
     path("withdraw/fund/", withdraw_fund, name="withdraw_fund"),

@@ -46,15 +46,6 @@ def customer_dashboard(request):
     if request.user.is_admin:
         return redirect('trade:prestige_wealth')
 
-    from django.template import TemplateDoesNotExist
-    from django.template.loader import get_template
-
-    try:
-        print(get_template("agent/dash.html"))
-    except TemplateDoesNotExist:
-        raise Exception("Template not found!")
-
-
     context = {
         "form": form,
         "open_trades": open_trades,
@@ -66,6 +57,7 @@ def customer_dashboard(request):
 @login_required
 def execute_trade(request):
     account = Account.objects.filter(customer__user=request.user).first()
+
     if request.method == "POST":
         form = TradeForm(request.POST)
         if form.is_valid():
@@ -83,40 +75,6 @@ def execute_trade(request):
             form = TradeForm()
 
     return redirect("trade:customer_dashboard")
-
-
-@login_required
-def upload_file(request, chat_id):
-    """
-    Handle file uploads for chat messages.
-    """
-    if request.method == "POST" and request.FILES.get("file"):
-        chat = get_object_or_404(
-            Chat.objects.filter(Q(customer=request.use | Q(staff=request.user))),
-            id=chat_id,
-        )
-
-        f = request.FILES["file"]
-        saved_name = default_storage.save(f"chat_files/{uuid.uuid4()}_{f.name}", f)
-        file_url = default_storage.url(saved_name)
-
-        msg = Message.objects.create(
-            chat=chat,
-            sender=request.user,
-            file=saved_name,
-            content=request.POST.get("message", ""),
-        )
-
-        return JsonResponse(
-            {
-                "file_url": file_url,
-                "message": msg.content,
-                "sender": request.user.id,
-                "timestamp": msg.created_at.strftime("%H:%M"),
-            }
-        )
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
@@ -251,6 +209,7 @@ def wallet_view(request):
 
 @login_required
 def profile_view(request):
+    
     customer = get_object_or_404(Customer, user=request.user)
     account = Account.objects.filter(customer=customer).first()
     transactions = Transaction.objects.filter(customer=customer)
