@@ -41,7 +41,6 @@
                 <p>Manage your account information and preferences</p>
             </div>
             
-            <!-- Profile Overview Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon balance-icon">
@@ -84,9 +83,7 @@
                 </div>
             </div>
             
-            <!-- Profile Form -->
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px;">
-                <!-- Personal Information -->
                 <div class="trade-form-container">
                     <h3>Personal Information</h3>
                     
@@ -100,56 +97,17 @@
                     </div>
                     {% endif %}
                     
-                    <form method="post" action="{% url 'trade:update_profile' %}">
+                    <form method="POST" action="{% url 'trade:update_customer_profile' request.user.id %}" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
-                        <div class="form-group">
-                            <label for="full_name">Full Name</label>
-                            <input type="text" id="full_name" name="full_name" class="form-control" 
-                                   value="{{ customer.full_name|default:'' }}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-control" 
-                                   value="{{ request.user.email|default:'' }}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" class="form-control" 
-                                   value="{{ customer.phone|default:'' }}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="country">Country</label>
-                            <input type="text" id="country" name="country" class="form-control" 
-                                   value="{{ customer.country|default:'' }}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <textarea id="address" name="address" class="form-control" rows="3">{{ customer.address|default:'' }}</textarea>
-                        </div>
-                        
+                        {{ form.as_p }}
                         <button type="submit" class="btn-trade">Update Profile</button>
                     </form>
                 </div>
                 
-                <!-- Account Security -->
                 <div class="trade-form-container">
                     <h3>Account Security</h3>
                     
-                    <div class="form-group">
-                        <label>Two-Factor Authentication</label>
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                            <span>{% if customer.two_factor_enabled %}Enabled{% else %}Disabled{% endif %}</span>
-                            <a href="#" class="btn-modal btn-modal-{% if customer.two_factor_enabled %}secondary{% else %}primary{% endif %}" 
-                               style="padding: 8px 16px; font-size: 0.9rem;">
-                                {% if customer.two_factor_enabled %}Disable{% else %}Enable{% endif %} 2FA
-                            </a>
-                        </div>
-                    </div>
+                    
                     
                     <div class="form-group">
                         <label>Last Login</label>
@@ -164,78 +122,13 @@
                             <span class="status-badge status-completed">Active</span>
                         </p>
                     </div>
-                    
-                    
-                   
                 </div>
             </div>
-            
-           
         </div>
     </div>
 </main>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Form validation
-    const profileForm = document.querySelector('form[action="{% url 'trade:update_profile' %}"]');
-    if (profileForm) {
-        profileForm.addEventListener('submit', function(e) {
-            const fullName = document.getElementById('full_name');
-            const email = document.getElementById('email');
-            
-            if (!fullName.value.trim()) {
-                e.preventDefault();
-                alert('Please enter your full name');
-                fullName.focus();
-                return false;
-            }
-            
-            if (!email.value.trim()) {
-                e.preventDefault();
-                alert('Please enter your email address');
-                email.focus();
-                return false;
-            }
-        });
-    }
-    
-  
-    // All other existing JavaScript from the dashboard
-    const toggleSidebar = document.getElementById("toggleSidebar");
-    const sidebar = document.getElementById("sidebar");
-    const mainContent = document.getElementById("mainContent");
-    
-    if (toggleSidebar) {
-        toggleSidebar.addEventListener("click", () => { 
-            sidebar.classList.toggle("collapsed"); 
-            mainContent.classList.toggle("expanded"); 
-        });
-    }
-
-    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-    const mobileOverlay = document.getElementById("mobileOverlay");
-    
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener("click", () => { 
-            sidebar.classList.toggle("active"); 
-            mobileOverlay.classList.toggle("active"); 
-            document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : ""; 
-        });
-    }
-    
-    if (mobileOverlay) {
-        mobileOverlay.addEventListener("click", () => { 
-            sidebar.classList.remove("active"); 
-            mobileOverlay.classList.remove("active"); 
-            document.body.style.overflow = ""; 
-        });
-    }
-});
-</script>
-
 <style>
-/* Additional styles for profile page */
 .user-avatar-large {
     width: 100px;
     height: 100px;
@@ -249,14 +142,12 @@ document.addEventListener('DOMContentLoaded', function() {
     font-weight: 700;
     margin: 0 auto 20px;
 }
-
 .profile-header {
     text-align: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(0,0,0,.06);
 }
-
 .verification-status {
     display: flex;
     align-items: center;
@@ -266,11 +157,9 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 8px;
     margin-bottom: 20px;
 }
-
 .verification-status.pending {
     background: rgba(255, 193, 7, 0.08);
 }
-
 .verification-status-icon {
     width: 50px;
     height: 50px;
@@ -282,23 +171,19 @@ document.addEventListener('DOMContentLoaded', function() {
     color: white;
     font-size: 1.5rem;
 }
-
 .verification-status.pending .verification-status-icon {
     background: var(--primary-gold);
 }
-
 .document-upload {
     background: var(--light-bg);
     padding: 20px;
     border-radius: 8px;
     margin-top: 20px;
 }
-
 .document-upload h4 {
     margin-top: 0;
     color: var(--primary-dark);
 }
-
 .upload-area {
     border: 2px dashed rgba(0,0,0,.1);
     border-radius: 8px;
@@ -308,23 +193,19 @@ document.addEventListener('DOMContentLoaded', function() {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
 .upload-area:hover {
     border-color: var(--primary-gold);
     background: rgba(212, 175, 55, 0.05);
 }
-
 .upload-area i {
     font-size: 2rem;
     color: var(--primary-gold);
     margin-bottom: 10px;
 }
-
 .upload-text {
     color: var(--text-light);
     margin-bottom: 15px;
 }
-
 .btn-upload {
     background: var(--primary-blue);
     color: white;

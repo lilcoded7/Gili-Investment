@@ -369,8 +369,8 @@
           <li><a href="{% url 'trade:deposit_account' %}"><i class="fas fa-money-bill-wave"></i><span class="menu-text">Deposit</span></a></li>
           <li><a href="{% url 'trade:withdraw_fund' %}"><i class="fas fa-hand-holding-usd"></i><span class="menu-text">Withdrawal</span></a></li>
           <li><a href="{% url 'trade:hero' %}"><i class="fas fa-gem"></i><span class="menu-text">Investment Plans</span></a></li>
-          <li><a href="##"><i class="fas fa-headset"></i><span class="menu-text">Support</span></a></li>
-          <li><a href="{% url 'trade:profile_view' %}"><i class="fas fa-cog"></i><span class="menu-text">Settings</span></a></li>
+          <li><a href="#"><i class="fas fa-headset"></i><span class="menu-text">Support</span></a></li>
+          <li><a href="{% url 'trade:update_customer_profile' request.user.id %}"><i class="fas fa-cog"></i><span class="menu-text">Settings</span></a></li>
           <li><a href="{% url 'accounts:logout_view' %}"><i class="fas fa-sign-out-alt"></i><span class="menu-text">Logout</span></a></li>
         </ul>
       </nav>
@@ -379,6 +379,7 @@
     <div class="mobile-overlay" id="mobileOverlay"></div>
     {% block content %}{% endblock content %}
     
+    <!-- Chat -->
     <div class="support-chat">
       <div id="chatBtn" class="chat-btn"><i class="fas fa-headset"></i></div>
       <div id="chatWindow" class="chat-window" aria-hidden="true">
@@ -396,11 +397,12 @@
           <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
         </div>
         <div class="chat-footer">
-          <a href="{% url 'trade:support_dashboard' %}" class="return-btn">Return</a>
+          <a href="{% url 'trade:customer_dashboard' %}" class="return-btn">Return</a>
         </div>
       </div>
     </div>
 
+    <!-- Notifications -->
     <div id="notificationToast" class="notification-toast">
       <div class="notification-icon"><i class="fas fa-coins"></i></div>
       <div class="notification-content">
@@ -412,8 +414,10 @@
   </div>
 
   <script src="https://s3.tradingview.com/tv.js"></script>
-  <script>
+  
+ <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // TradingView init
   let tvWidget=null;
   const initTradingView=(symbol="BINANCE:BTCUSDT",interval="60")=>{
     try{if(tvWidget)tvWidget.remove()}catch(e){}
@@ -424,19 +428,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
   initTradingView();
-  const timeframeBtns=document.querySelectorAll(".timeframe-btn");
-  const symbolSelect=document.getElementById("symbolSelect");
-  timeframeBtns.forEach(btn=>{
-    btn.addEventListener("click",function(){
-      timeframeBtns.forEach(b=>b.classList.remove("active"));
-      this.classList.add("active");
-      initTradingView(symbolSelect.value,this.dataset.timeframe);
-    });
-  });
-  symbolSelect?.addEventListener("change",()=>{
-    const active=document.querySelector(".timeframe-btn.active");
-    initTradingView(symbolSelect.value,active?.dataset.timeframe||"60");
-  });
+
+  // --- Sidebar toggle etc (unchanged) ---
   const sidebar=document.getElementById("sidebar");
   const mainContent=document.getElementById("mainContent");
   const toggleSidebar=document.getElementById("toggleSidebar");
@@ -456,53 +449,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mobileOverlay.classList.remove("active");
     document.body.style.overflow="";
   });
-  window.addEventListener("resize",()=>{
-    if(window.innerWidth<=992){
-      sidebar.classList.remove("collapsed");
-      mainContent?.classList.remove("expanded");
-      sidebar.style.transform=sidebar.classList.contains("active")?"translateX(0)":"translateX(-100%)";
-    }else{
-      sidebar.style.transform="translateX(0)";
-      mobileOverlay?.classList.remove("active");
-      document.body.style.overflow="";
-    }
-  });
-  const buyBtn=document.getElementById("buyBtn");
-  const sellBtn=document.getElementById("sellBtn");
-  const setTradeType=type=>{
-    const hiddenInput=document.querySelector('[name="trade_type"]');
-    if(hiddenInput)hiddenInput.value=type;
-    buyBtn?.classList.toggle("active",type==="buy");
-    sellBtn?.classList.toggle("active",type==="sell");
-  };
-  buyBtn?.addEventListener("click",()=>setTradeType("buy"));
-  sellBtn?.addEventListener("click",()=>setTradeType("sell"));
-  setTradeType(document.querySelector('[name="trade_type"]')?.value||"buy");
-  const tradeForm=document.getElementById("tradeForm");
-  tradeForm?.addEventListener("submit",e=>{
-    const symbolEl=tradeForm.querySelector('[name="symbol"],#id_symbol,select[name="symbol"]');
-    const amountEl=tradeForm.querySelector('[name="amount"],#id_amount');
-    const errors=[];
-    if(!symbolEl?.value)errors.push("Symbol is required");
-    if(!amountEl?.value||isNaN(parseFloat(amountEl.value))||parseFloat(amountEl.value)<=0)errors.push("Enter a valid amount > 0");
-    if(errors.length){
-      e.preventDefault();
-      const container=document.createElement("div");
-      container.className="messages-django";
-      errors.forEach(err=>{
-        const div=document.createElement("div");
-        div.className="msg-item msg-error";
-        div.textContent=err;
-        container.appendChild(div);
-      });
-      tradeForm.parentNode.querySelector(".messages-django")?.remove();
-      tradeForm.parentNode.insertBefore(container,tradeForm.parentNode.firstChild);
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-  });
-  document.querySelectorAll(".close-trade-form").forEach(f=>{
-    f.addEventListener("submit",ev=>{if(!confirm("Close this position?"))ev.preventDefault()});
-  });
+
+  // --- Chat System ---
   const chatBtn=document.getElementById("chatBtn");
   const chatWindow=document.getElementById("chatWindow");
   const chatClose=document.getElementById("chatClose");
@@ -513,6 +461,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatFile=document.getElementById("chatFile");
   const emojiBtn=document.getElementById("emojiBtn");
   const emojiPicker=document.getElementById("emojiPicker");
+
+  // emojis
   const emojis=["😀","😂","😍","😎","👍","🙏","🔥","💯","🎉"];
   emojis.forEach(e=>{
     const span=document.createElement("span");
@@ -527,14 +477,15 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     emojiPicker.style.display=emojiPicker.style.display==="none"?"block":"none";
   });
-  const appendMessage=(content,cls,isFile=false)=>{
+
+  const appendMessage=(content,cls,isFile=false,filename=null)=>{
     const div=document.createElement("div");
     div.className="message "+cls;
     if(isFile){
-      if(/\.(jpg|jpeg|png|gif|webp)$/i.test(content)){
+      if(/\.(jpg|jpeg|png|gif|webp)$/i.test(filename)){
         div.innerHTML=`<img src="${content}" class="chat-image" alt="Image"/>`;
       }else{
-        div.innerHTML=`<a href="${content}" target="_blank">File</a>`;
+        div.innerHTML=`<a href="${content}" target="_blank">${filename||"File"}</a>`;
       }
     }else{
       div.textContent=content;
@@ -542,6 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMessages.appendChild(div);
     chatMessages.scrollTop=chatMessages.scrollHeight;
   };
+
   const getCookie=name=>{
     let cookieValue=null;
     if(document.cookie&&document.cookie!==""){
@@ -552,6 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return cookieValue;
   };
+
   const sendMessageToBackend=async(message,file=null)=>{
     try{
       const formData=new FormData();
@@ -564,15 +517,38 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data=await res.json();
       if(data.success){
-        if(data.file_url)appendMessage(data.file_url,"user",true);
+        if(data.file_url)appendMessage(data.file_url,"user",true,data.filename);
         if(data.support_message)appendMessage(data.support_message.content,"support");
       }else appendMessage("Error sending message.","system");
     }catch(e){appendMessage("Failed to send message.","system")}
   };
+
+  // --- Load conversation for customer ---
+  const loadConversation=async()=>{
+    try{
+      const res=await fetch("/customer/conversation/");
+      const data=await res.json();
+      chatMessages.innerHTML="";
+      if(!data.success){
+        appendMessage(data.error||"No messages.","system");
+        return;
+      }
+      data.messages.forEach(msg=>{
+        appendMessage(
+          msg.message_type==="file"?msg.file_url:msg.content,
+          msg.sender_type==="customer"?"user":"support",
+          msg.message_type==="file",
+          msg.filename
+        );
+      });
+    }catch(e){appendMessage("Failed to load chat.","system")}
+  };
+
   chatBtn?.addEventListener("click",()=>{
     chatWindow.classList.toggle("active");
     chatWindow.setAttribute("aria-hidden",!chatWindow.classList.contains("active"));
     chatInput?.focus();
+    loadConversation();
   });
   chatClose?.addEventListener("click",()=>{
     chatWindow.classList.remove("active");
@@ -592,6 +568,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if(e.key==="Enter"){e.preventDefault();chatSend.click()}
   });
   fileBtn?.addEventListener("click",()=>chatFile.click());
+
+  // --- Notifications (unchanged) ---
   const notif=document.getElementById("notificationToast");
   const toastMessage=document.getElementById("toastMessage");
   const toastTitle=document.getElementById("notifyTitle");
@@ -623,7 +601,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showNotification(msg,"Withdrawal Processed");
   },2000);
 });
-  </script>
+</script>
 </body>
 
 

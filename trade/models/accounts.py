@@ -9,7 +9,7 @@ def gen_account():
 
 
 class Account(BaseModel):
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='customer_accounts')
     balance = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     account_number = models.CharField(max_length=20, editable=False,unique=True, default=gen_account())
 

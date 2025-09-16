@@ -31,38 +31,37 @@
     </div>
   </header>
 
+  <!-- Message Container -->
+  <div id="messageContainer"></div>
+
   <!-- Stats Cards -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-icon users-icon"><i class="fas fa-users"></i></div>
       <div class="stat-info">
-        <h3>2,458</h3>
+        <h3>{{ total_users }}</h3>
         <p>Total Users</p>
-        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 12.5%</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon revenue-icon"><i class="fas fa-dollar-sign"></i></div>
       <div class="stat-info">
-        <h3>$1.24M</h3>
+        <h3>${{ total_revenue|floatformat:2 }}</h3>
         <p>Total Revenue</p>
-        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 8.3%</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon trades-icon"><i class="fas fa-exchange-alt"></i></div>
       <div class="stat-info">
-        <h3>12,847</h3>
+        <h3>{{ total_trades }}</h3>
         <p>Total Trades</p>
-        <div class="stat-change change-positive"><i class="fas fa-arrow-up"></i> 5.7%</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon pending-icon"><i class="fas fa-clock"></i></div>
       <div class="stat-info">
-        <h3>47</h3>
+        <h3>{{ pending_requests }}</h3>
         <p>Pending Requests</p>
-        <div class="stat-change change-negative"><i class="fas fa-arrow-down"></i> 2.1%</div>
       </div>
     </div>
   </div>
@@ -110,9 +109,14 @@
             {% endif %}
           </td>
           <td>
-            <a href="{% url 'edit_trade' trade.id %}" class="btn-action btn-view">
+            <a href="{% url 'trade:edit_trade' trade.id %}" class="btn-action btn-view">
               <i class="fas fa-edit"></i> Edit
             </a>
+            {% if trade.status == "open" %}
+            <a href="{% url 'trade:cancel_trade' trade.id %}" class="btn-action btn-view">
+              <i class="fas fa-lock"></i> Close Trade
+            </a>
+            {% endif %}
           </td>
         </tr>
         {% empty %}
@@ -126,5 +130,44 @@
     </table>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    {% if messages %}
+      {% for message in messages %}
+        const container = document.getElementById("messageContainer");
+        const alertBox = document.createElement("div");
+        alertBox.className = "alert-message {{ message.tags }}";
+        alertBox.innerHTML = `
+          <span>{{ message }}</span>
+          <button style="margin-left:10px;background:none;border:none;color:inherit;cursor:pointer;font-weight:bold;">&times;</button>
+        `;
+        alertBox.style.padding = "12px 16px";
+        alertBox.style.borderRadius = "8px";
+        alertBox.style.margin = "10px 0";
+        alertBox.style.display = "flex";
+        alertBox.style.justifyContent = "space-between";
+        alertBox.style.alignItems = "center";
+        if ("{{ message.tags }}" === "success") {
+          alertBox.style.background = "#d1fae5";
+          alertBox.style.color = "#065f46";
+        } else if ("{{ message.tags }}" === "error") {
+          alertBox.style.background = "#fee2e2";
+          alertBox.style.color = "#991b1b";
+        } else if ("{{ message.tags }}" === "warning") {
+          alertBox.style.background = "#fef3c7";
+          alertBox.style.color = "#92400e";
+        }
+        alertBox.querySelector("button").addEventListener("click", () => {
+          alertBox.remove();
+        });
+        container.appendChild(alertBox);
+        setTimeout(() => {
+          alertBox.remove();
+        }, 4000);
+      {% endfor %}
+    {% endif %}
+  });
+</script>
 
 {% endblock content %}

@@ -82,9 +82,7 @@
           <th>Amount</th>
           <th>Status</th>
           <th>Reference</th>
-          <th>Remarks</th>
           <th>Date</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -102,14 +100,13 @@
               <span class="status-badge status-inactive">Failed</span>
             {% endif %}
           </td>
-          <td>{{ txn.reference }}</td>
-          <td>{{ txn.remarks|default:"-" }}</td>
+          <td>{{ txn.transaction_id }}</td>
           <td>{{ txn.created_at|date:"M d, Y H:i" }}</td>
-          <td>
-            <a href="{% url 'transaction_detail' txn.id %}" class="btn-action btn-view">
+          <!-- <td>
+            <a href="##" class="btn-action btn-view">
               <i class="fas fa-eye"></i> View
             </a>
-          </td>
+          </td> -->
         </tr>
         {% empty %}
         <tr>

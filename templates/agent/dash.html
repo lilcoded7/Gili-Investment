@@ -141,8 +141,8 @@
                 <td>${{ w.amount }}</td>
                 <td>{{ w.created_at|timesince }} ago</td>
                 <td>
-                    <button class="btn-action btn-edit"><i class="fas fa-check"></i> Approve</button>
-                    <button class="btn-action btn-delete"><i class="fas fa-times"></i> Deny</button>
+                    <a href="{% url 'trade:approved_customer_withdrawal' w.id %}" class="btn-action btn-edit"><i class="fas fa-check"></i> Approve</a>
+                    <a href="{% url 'trade:cancel_customer_account' w.id %}" class="btn-action btn-delete"><i class="fas fa-times"></i> Deny</a>
                 </td>
                 </tr>
             {% empty %}
@@ -160,40 +160,75 @@
             <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
         </h3>
         <table class="table">
-            <thead>
+          <thead>
             <tr>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Status</th>
+              <th>User</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {% for d in deposits %}
-                <tr>
+              <tr>
                 <td>{{ d.customer.user.username }}</td>
                 <td>${{ d.amount }}</td>
                 <td>{{ d.created_at|date:"M d, Y H:i" }}</td>
                 <td>
-                    {% if d.status == "credited" %}
+                  {% if d.status == "credited" %}
                     <span class="status-badge status-completed">Completed</span>
-                    {% elif d.status == "pending" %}
+                  {% elif d.status == "pending" %}
                     <span class="status-badge status-pending">Processing</span>
-                    {% else %}
+                  {% else %}
                     <span class="status-badge status-failed">Failed</span>
-                    {% endif %}
+                  {% endif %}
                 </td>
-                </tr>
+                <td>
+                  {% if d.status == "pending" %}
+                  <a href="{% url 'trade:credit_customer_account' d.id %}" class="action-btn btn-credit">Credit</a>
+                  {% endif %}
+                  <a href="{% url 'trade:cancel_customer_account' d.id %}" class="action-btn btn-cancel">Cancel</a>
+                </td>
+              </tr>
             {% empty %}
-                <tr>
-                <td colspan="4" style="text-align:center;">No recent deposits</td>
-                </tr>
+              <tr>
+                <td colspan="5" style="text-align:center;">No recent deposits</td>
+              </tr>
             {% endfor %}
-            </tbody>
+          </tbody>
         </table>
         </div>
 
       </div>
     </div>
 
+
+    <style>
+  .action-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+    color: #fff;
+  }
+
+  .btn-credit {
+    background-color: #27ae60; /* Green */
+  }
+  .btn-credit:hover {
+    background-color: #1e8449;
+  }
+
+  .btn-cancel {
+    background-color: #e74c3c; /* Red */
+  }
+  .btn-cancel:hover {
+    background-color: #c0392b;
+  }
+</style>
     {% endblock content %}

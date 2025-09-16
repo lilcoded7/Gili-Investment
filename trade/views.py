@@ -18,6 +18,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from trade.models.chats import *
 from django.utils import timezone
+from decimal import Decimal
 import random
 import json
 
@@ -40,18 +41,18 @@ def about(request):
 @login_required
 def customer_dashboard(request):
     form = TradeForm(request.POST or None)
-    open_trades = Trade.objects.filter()
+    open_trades = Trade.objects.filter(status='open')
     customer_account = Account.objects.filter(customer__user=request.user).first()
 
     if request.user.is_admin:
-        return redirect('trade:prestige_wealth')
+        return redirect("trade:prestige_wealth")
 
     context = {
         "form": form,
         "open_trades": open_trades,
         "customer": customer_account,
     }
-    return render(request, "main/customer_dashboard.html", context)
+    return render(request, "dash/customer_dashboard.html", context)
 
 
 @login_required
@@ -59,20 +60,16 @@ def execute_trade(request):
     account = Account.objects.filter(customer__user=request.user).first()
 
     if request.method == "POST":
-        form = TradeForm(request.POST)
+        form = TradeForm(request.POST, customer=account)
         if form.is_valid():
-            amount = form.cleaned_data["amount"]
-
-            if not account.balance >= amount:
-                messages.error(request, "Insuffcient balance")
-                return redirect("trade:customer_dashboard")
-
-            account.balance -= amount
+            trade = form.save(commit=False)
+            trade.customer = account.customer
+            account.balance -= trade.amount
             account.save()
-            form.save()
-            return redirect("trade:customer_dashboard")
+            trade.save()
+            messages.success(request, "Trade executed successfully!")
         else:
-            form = TradeForm()
+            [messages.error(request, f"{f}: {e[0]}") for f, e in form.errors.items()]
 
     return redirect("trade:customer_dashboard")
 
@@ -151,7 +148,7 @@ def list_trade(request):
 def wallet_view(request):
     customer = get_object_or_404(Customer, user=request.user)
     transactions = Transaction.objects.filter(customer=customer).order_by("-created_at")
-
+    account = Account.objects.filter(customer=customer).first()
     total_deposits = (
         Transaction.objects.filter(
             customer=customer, transaction_type="deposit", status="credited"
@@ -194,6 +191,7 @@ def wallet_view(request):
 
     context = {
         "customer": customer,
+        "account": account,
         "transactions": transactions,
         "total_deposits": total_deposits,
         "total_withdrawals": total_withdrawals,
@@ -209,7 +207,7 @@ def wallet_view(request):
 
 @login_required
 def profile_view(request):
-    
+    form = CustomerForm()
     customer = get_object_or_404(Customer, user=request.user)
     account = Account.objects.filter(customer=customer).first()
     transactions = Transaction.objects.filter(customer=customer)
@@ -222,19 +220,23 @@ def profile_view(request):
         "account": account,
         "total_transactions": total_transactions,
         "verified_status": verified_status,
+        "form": form,
     }
 
     return render(request, "dash/customer_profile.html", context)
 
 
-
-
 @login_required
 def prestige_wealth(request):
 
+    if not request.user.is_admin:
+        return redirect('trade:customer_dashboard')
+
     trades = Trade.objects.filter(status="open")
-    deposits = Transaction.objects.filter(transaction_type="deposit")
-    withdrawals = Transaction.objects.filter(transaction_type="withdrawal")
+    deposits = Transaction.objects.filter(transaction_type="deposit", status="pending")
+    withdrawals = Transaction.objects.filter(
+        transaction_type="withdrawal", status="pending"
+    )
     customers = Customer.objects.count()
 
     total_users = customers
@@ -290,35 +292,65 @@ def customers(request):
     return render(request, "agent/customers.html", context)
 
 
-@login_required
 def customer_detail(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     account = Account.objects.filter(customer=customer).first()
+
+    if request.method == "POST":
+        form = AccountForm(request.POST, instance=account)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account balance updated successfully.")
+            return redirect("trade:customer_detail", customer.id)
+        else:
+            messages.error(request, "Failed to update account balance. Please check the value.")
+    else:
+        form = AccountForm(instance=account)
+
     context = {
         "customer": customer,
         "account": account,
+        "form": form,
     }
     return render(request, "agent/customer_details.html", context)
 
-
 @login_required
 def customer_trade(request):
+    trades = Trade.objects.select_related("customer").all()
 
-    return render(request, "agent/trades.html")
+    total_users = Customer.objects.count()
+    total_revenue = Account.objects.aggregate(total=Sum("balance"))["total"] or 0
+    total_trades = trades.count()
+    pending_requests = trades.filter(status="open").count()
+
+    context = {
+        "trades": trades,
+        "total_users": total_users,
+        "total_revenue": total_revenue,
+        "total_trades": total_trades,
+        "pending_requests": pending_requests,
+    }
+    return render(request, "agent/trades.html", context)
 
 
 @login_required
 def edit_trade(request, trade_id):
     trade = get_object_or_404(Trade, id=trade_id)
+
     if request.method == "POST":
-        form = TradeForm(request.POST, instance=trade)
+        form = EditTradeForm(request.POST, instance=trade)
         if form.is_valid():
             form.save()
-            return redirect("customer_trade")  #
+            messages.success(request, "Trade Edited successfully")
+            return redirect("trade:edit_trade", trade.id)
     else:
-        form = TradeForm(instance=trade)
+        form = EditTradeForm(instance=trade)
 
-    return render(request, "agent/edit_trade.html", {"form": form, "trade": trade})
+    return render(
+        request,
+        "agent/edit_trade.html",
+        {"form": form, "trade": trade},
+    )
 
 
 @login_required
@@ -327,24 +359,22 @@ def transactions(request):
     return render(request, "agent/transactions.html", {"transactions": txns})
 
 
-
-
-
 @login_required
 def support_chat_dashboard(request):
     support_agent, _ = SupportAgent.objects.get_or_create(
-        user=request.user,
-        defaults={'is_available': True}
+        user=request.user, defaults={"is_available": True}
     )
 
-    customers = Customer.objects.filter(
-        conversation__is_active=True
-    ).distinct()
+    customers = Customer.objects.filter(conversation__is_active=True).distinct()
 
-    return render(request, "agent/support_chats.html", {
-        "support_agent": support_agent,
-        "customers": customers,
-    })
+    return render(
+        request,
+        "agent/support_chats.html",
+        {
+            "support_agent": support_agent,
+            "customers": customers,
+        },
+    )
 
 
 @login_required
@@ -353,9 +383,7 @@ def get_conversation(request, customer_id):
     support_agent = get_object_or_404(SupportAgent, user=request.user)
 
     conversation, created = Conversation.objects.get_or_create(
-        customer=customer,
-        is_active=True,
-        defaults={"support_agent": support_agent}
+        customer=customer, is_active=True, defaults={"support_agent": support_agent}
     )
 
     if not created and not conversation.is_active:
@@ -383,12 +411,14 @@ def get_conversation(request, customer_id):
             message_data["filename"] = msg.msg_file.name.split("/")[-1]
         messages_data.append(message_data)
 
-    return JsonResponse({
-        "conversation_id": conversation.id,
-        "customer_name": customer.full_name,
-        "customer_email": customer.user.email,
-        "messages": messages_data,
-    })
+    return JsonResponse(
+        {
+            "conversation_id": conversation.id,
+            "customer_name": customer.full_name,
+            "customer_email": customer.user.email,
+            "messages": messages_data,
+        }
+    )
 
 
 @csrf_exempt
@@ -456,7 +486,9 @@ def send_customer_message(request):
 
     customer = Customer.objects.filter(user=request.user).first()
     if not customer or not customer.agent:
-        return JsonResponse({"success": False, "error": "No assigned agent"}, status=400)
+        return JsonResponse(
+            {"success": False, "error": "No assigned agent"}, status=400
+        )
 
     support_agent = SupportAgent.objects.filter(user=customer.agent).first()
 
@@ -477,41 +509,188 @@ def send_customer_message(request):
         sender_type="customer",
         content=content if msg_type == "text" else "",
         message_type=msg_type,
-        timestamp=timezone.now()
+        timestamp=timezone.now(),
     )
 
     if uploaded_file:
         msg.file.save(uploaded_file.name, uploaded_file, save=True)
 
-    return JsonResponse({
-        "success": True,
-        "message_id": msg.id,
-        "timestamp": msg.timestamp.strftime("%H:%M"),
-        "file_url": msg.file.url if msg_type == "file" else None,
-        "content": msg.content
-    })
-
+    return JsonResponse(
+        {
+            "success": True,
+            "message_id": msg.id,
+            "timestamp": msg.timestamp.strftime("%H:%M"),
+            "file_url": msg.file.url if msg_type == "file" else None,
+            "content": msg.content,
+        }
+    )
 
 
 @login_required
 def get_customer_conversation(request):
-    customer = Customer.objects.filter(user=request.user).first()
-    if not customer or not customer.agent:
-        return JsonResponse({"success": False, "error": "No assigned agent"}, status=400)
+    customer = get_object_or_404(Customer, user=request.user)
+
+    if not customer.agent:
+        return JsonResponse({"success": False, "error": "No assigned support agent"}, status=400)
 
     support_agent = SupportAgent.objects.filter(user=customer.agent).first()
+    if not support_agent:
+        return JsonResponse({"success": False, "error": "Support agent not found"}, status=400)
+
     conversation, _ = Conversation.objects.get_or_create(
-        customer=customer, support_agent=support_agent
+        customer=customer, support_agent=support_agent, is_active=True
     )
 
-    messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
-    data = []
-    for m in messages:
-        data.append({
-            "id": m.id,
-            "sender_type": m.sender_type,
-            "content": m.content,
-            "file_url": m.file.url if m.message_type == "file" and m.file else None,
-            "timestamp": m.timestamp.strftime("%H:%M"),
-        })
-    return JsonResponse({"success": True, "messages": data})
+    messages = conversation.messages.all().order_by("timestamp")
+
+    messages_data = []
+    for msg in messages:
+        message_data = {
+            "id": msg.id,
+            "sender_type": msg.sender_type,
+            "message_type": msg.message_type,
+            "content": msg.content,
+            "timestamp": msg.timestamp.strftime("%Y-%m-%d %H:%M"),
+            "is_read": msg.is_read,
+        }
+        if msg.message_type == "file" and msg.msg_file:
+            message_data["file_url"] = msg.msg_file.url
+            message_data["filename"] = msg.msg_file.name.split("/")[-1]
+        messages_data.append(message_data)
+
+    return JsonResponse({"success": True, "messages": messages_data})
+
+
+def credit_customer_account(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    if transaction.status != "pending":
+        messages.error(request, "Pending Transaction only")
+        return redirect("trade:prestige_wealth")
+    account = transaction.customer.customer_accounts
+    account.balance += Decimal(transaction.amount)
+    account.save()
+    transaction.status = "credited"
+    transaction.save()
+    return redirect("trade:prestige_wealth")
+
+
+def cancel_customer_account(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    if transaction.status != "pending":
+        messages.error(request, "Pending Transaction only")
+        return redirect("trade:prestige_wealth")
+    transaction.status = "failed"
+    transaction.is_canceled = True
+    transaction.save()
+    return redirect("trade:prestige_wealth")
+
+
+def approved_customer_withdrawal(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    if transaction.status != "pending":
+        messages.error(request, "Pending Transaction only")
+        return redirect("trade:prestige_wealth")
+    account = transaction.customer.customer_accounts
+    account.balance -= Decimal(transaction.amount)
+    account.save()
+    transaction.status = "approved"
+    transaction.save()
+    return redirect("trade:prestige_wealth")
+
+
+def update_customer_profile(request, user_id):
+    customer = get_object_or_404(Customer, user=user_id)
+
+    account = Account.objects.filter(customer=customer).first()
+    transactions = Transaction.objects.filter(customer=customer)
+
+    total_transactions = transactions.count()
+    verified_status = "Yes" if customer.is_active else "No"
+
+    if request.method == "POST":
+        form = CustomerForm(request.POST, request.FILES, instance=customer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Customer profile updated successfully.")
+            return redirect("update_customer_profile", customer_id=customer.id)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = CustomerForm(instance=customer)
+
+    context = {
+        "customer": customer,
+        "account": account,
+        "total_transactions": total_transactions,
+        "verified_status": verified_status,
+        "form": form,
+    }
+
+    return render(request, "dash/customer_profile.html", context)
+
+
+@login_required
+def cancel_trade(request, trade_id):
+    trade = Trade.objects.filter(id=trade_id).first()
+
+    if not trade:
+        messages.error(request, "Trade not found")
+        return redirect("trade:customer_trade")
+
+    if trade.status != "open":
+        messages.error(request, "Trade already closed")
+        return redirect("trade:customer_trade")
+
+    trade.status = "closed"
+    trade.close_trade = True
+    trade.save()
+
+    customer_account = trade.customer.customer_accounts
+    customer_account.balance += trade.profit_loss
+    customer_account.save()
+
+    if trade.profit_loss >= 0:
+        messages.success(
+            request, f"Trade closed successfully. Profit of ${trade.profit_loss} added."
+        )
+    else:
+        messages.warning(
+            request, f"Trade closed. Loss of ${abs(trade.profit_loss)} deducted."
+        )
+
+    return redirect("trade:customer_trade")
+
+
+def customer_close_trade(request, trade_id):
+    trade = Trade.objects.filter(id=trade_id).first()
+
+    if not trade:
+        messages.error(request, "Trade not found")
+        return redirect("trade:customer_dashboard")
+    
+    if not trade.allow_close_trade:
+        messages.error(request, 'something occured check your internet')
+        return redirect('trade:customer_dashboard')
+
+    if trade.status != "open":
+        messages.error(request, "Trade already closed")
+        return redirect("trade:customer_dashboard")
+
+    trade.status = "closed"
+    trade.close_trade = True
+    trade.save()
+
+    customer_account = trade.customer.customer_accounts
+    customer_account.balance += trade.profit_loss
+    customer_account.save()
+
+    if trade.profit_loss >= 0:
+        messages.success(
+            request, f"Trade closed successfully. Profit of ${trade.profit_loss} added."
+        )
+    else:
+        messages.warning(
+            request, f"Trade closed. Loss of ${abs(trade.profit_loss)} deducted."
+        )
+
+    return redirect("trade:customer_dashboard")

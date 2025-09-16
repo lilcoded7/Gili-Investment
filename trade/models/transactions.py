@@ -7,13 +7,12 @@ class Transaction(BaseModel):
     SYMBOL_CHOICES = [
         ('BTC/USD', 'BTC/USD'),
         ('ETH/USD', 'ETH/USD'),
-        ('XRP/USD', 'XRP/USD'),
-        ('LTC/USD', 'LTC/USD'),
-        ('ADA/USD', 'ADA/USD'),
+        
     ]
     STATUS = [
         ('pending', 'pending'),
         ('credited', 'credited'),
+        ('approved', 'approved'),
         ('failed', 'failed'),
     ]
     TYPE = [
@@ -28,6 +27,8 @@ class Transaction(BaseModel):
     status = models.CharField(max_length=100, choices=STATUS, default='pending')
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     response = models.JSONField(null=True, blank=True)
+
+    is_canceled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Customer: {self.customer.full_name} Amount: {self.amount} Status: {self.status}"

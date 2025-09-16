@@ -4,7 +4,6 @@
 
 {% block content %}
 
-
 <main class="main-content" id="mainContent">
   <header class="top-header">
     <div style="display:flex;align-items:center;gap:12px">
@@ -81,16 +80,17 @@
                   <td>{{ trade.leverage }}</td>
                   <td>{% if trade.stop_loss %}${{ trade.stop_loss }}{% else %}&ndash;{% endif %}</td>
                   <td>{% if trade.take_profit %}${{ trade.take_profit }}{% else %}&ndash;{% endif %}</td>
-                  <td style="color:{% if trade.profit_loss|floatformat:2 >= 0 %}var(--success){% else %}var(--danger){% endif %};">{% if trade.profit_loss|floatformat:2 >= 0 %}+{% endif %}{{ trade.profit_loss }}</td>
+                  <td class="profit-loss" data-leverage="{{ trade.leverage }}">$0.00</td>
                   <td><span class="status-badge {% if trade.status == 'open' %}status-open{% else %}status-closed{% endif %}">{{ trade.status|capfirst }}</span></td>
                   <td>
                     {% if trade.status == "open" %}
-                      <form method="post" action="##" class="close-trade-form">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-close">Close</button>
-                      </form>
+                    
+                       
+                    <a href="{% url 'trade:customer_close_trade' trade.id %}"  class="btn-close">Close</a>
+                      
                     {% else %}
-                      <span class="status-badge">Closed</span>
+                      <a href="{% url 'trade:customer_close_trade' trade.id %}"><span class="status-badge">Closed</span></a>
+                      
                     {% endif %}
                   </td>
                 </tr>
@@ -117,8 +117,7 @@
           <form id="tradeForm" method="post" action="{% url 'trade:execute_trade' %}">
             {% csrf_token %}
             <div class="trade-type" role="group" aria-label="Trade type">
-              <button type="button" id="buyBtn" class="trade-type-btn buy">Buy</button>
-              <button type="button" id="sellBtn" class="trade-type-btn sell">Sell</button>
+              {{form.trade_type}}
             </div>
 
             <div class="form-group">
@@ -183,5 +182,26 @@
   </div>
 </main>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function formatCurrency(value) {
+    return (value >= 0 ? "+" : "") + "$" + value.toFixed(2);
+  }
+  function updateProfitLoss() {
+    document.querySelectorAll("#positionsBody tr[data-trade-id]").forEach(row => {
+      const profitLossCell = row.querySelector(".profit-loss");
+      if (!profitLossCell) return;
+      const leverage = parseFloat(profitLossCell.dataset.leverage) || 1;
+      let current = parseFloat(profitLossCell.dataset.current || "0");
+      let change = (Math.random() * 10 - 5) * leverage;
+      let newValue = current + change;
+      profitLossCell.dataset.current = newValue;
+      profitLossCell.textContent = formatCurrency(newValue);
+      profitLossCell.style.color = newValue >= 0 ? "var(--success)" : "var(--danger)";
+    });
+  }
+  setInterval(updateProfitLoss, 1000);
+});
+</script>
 
 {% endblock content %}
