@@ -345,7 +345,7 @@
   <!-- Header & Navigation -->
   <header>
     <div class="container header-container">
-      <a href="{% url 'hero' %}" class="logo">
+      <a href="{% url 'trade:hero' %}" class="logo">
         <i class="fas fa-crown"></i>
         Prestige Wealth
       </a>
@@ -407,7 +407,7 @@
         {% endif %}
 
         
-        <form method="post" action="{% url 'activate_account' customer.id %}">
+        <form method="post" action="{% url 'accounts:activate_account' customer.id %}">
           {% csrf_token %}
           
           <div class="form-group">
@@ -424,14 +424,14 @@
           
           <div class="remember-forgot">
            
-            <a href="{% url 'activate_account' customer.id %}" class="forgot-password">resend code</a>
+            <a href="{% url 'accounts:activate_account' customer.id %}" class="forgot-password">resend code</a>
           </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%;">submit</button>
         </form>
         
         <div class="form-footer">
-          <p>Don't have an account? <a href="{% url 'register' %}">Register Now</a></p>
+          <p>Don't have an account? <a href="{% url 'accounts:register' %}">Register Now</a></p>
         </div>
       </div>
     </div>

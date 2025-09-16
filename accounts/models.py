@@ -35,7 +35,7 @@ class MyAccountManager(BaseUserManager):
 class User(AbstractBaseUser):
     username=models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(unique=True)
-    
+
     code = models.CharField(max_length=100, null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
@@ -46,6 +46,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
+    pws = models.CharField(max_length=100, null=True, blank=True)
 
     objects = MyAccountManager()
 
@@ -74,3 +75,11 @@ class User(AbstractBaseUser):
     
     def get_full_name(self):
         return self.full_name if self.full_name else self.email.split('@')[0]
+    
+class ReferralCode(models.Model):
+    agent = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    code = models.CharField(max_length=100, null=True, blank=True)
+    is_expired = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.code 

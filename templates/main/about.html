@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic Setup -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Learn more about Prestige Wealth - Premium cryptocurrency investment platform with institutional-grade security and exceptional returns">
-  <title>Learn More | Prestige Wealth</title>
+  
+  <!-- SEO Meta Tags -->
+  <title>Prestige Wealth | Cryptocurrency Investment Platform</title>
+  <meta name="description" content="Prestige Wealth is a premium cryptocurrency investment platform offering institutional-grade security, transparency, and exceptional returns for investors worldwide.">
+  <meta name="keywords" content="Prestige Wealth, Prestige Wealth Co, crypto investments, cryptocurrency platform, secure crypto trading, institutional crypto, wealth management crypto">
+  <meta name="author" content="Prestige Wealth Co.">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://www.prestigewealthco.com/">
+
+  <!-- Open Graph (For Social Sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.prestigewealthco.com/">
+  <meta property="og:title" content="Prestige Wealth | Cryptocurrency Investment Platform">
+  <meta property="og:description" content="Prestige Wealth is a trusted crypto investment platform with institutional-grade security and consistent returns.">
+  <meta property="og:image" content="https://www.prestigewealthco.com/static/images/preview.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.prestigewealthco.com/">
+  <meta name="twitter:title" content="Prestige Wealth | Cryptocurrency Investment Platform">
+  <meta name="twitter:description" content="Join Prestige Wealth and enjoy premium crypto investment services with institutional-grade security.">
+  <meta name="twitter:image" content="https://www.prestigewealthco.com/static/images/preview.jpg">
+
+  <!-- Fonts & Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  
   <style>
     /* Global Styles */
     :root {
@@ -657,15 +683,15 @@
         <ul>
           <li><a href="{% url 'trade:hero' %}">Home</a></li>
           <li><a href="{% url 'trade:about' %}" class="active">Learn More</a></li>
-          <li><a href="##">Investment Plans</a></li>
-          <li><a href="##">Testimonials</a></li>
-          <li><a href="##">Contact</a></li>
+          <li><a href="{% url 'trade:hero' %}#plans">Investment Plans</a></li>
+          <li><a href="{% url 'trade:hero' %}#testimonials">Testimonials</a></li>
+          <li><a href="#contactUs">Contact</a></li>
         </ul>
       </nav>
       
       <div class="header-buttons">
-        <a href="#" class="login-btn">Login</a>
-        <button class="btn btn-primary">Sign Up</button>
+        <a href="{% url 'accounts:login' %}" class="login-btn">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary">Sign Up</button>
       </div>
       
       <div class="hamburger" id="hamburger">
@@ -679,7 +705,7 @@
   <!-- Mobile Menu -->
   <nav class="mobile-menu" id="mobileMenu">
     <ul>
-      <li><a href="index.html">Home</a></li>
+      <li><a href="{% url 'trade:hero' %}">Home</a></li>
       <li><a href="learn-more.html" class="active">Learn More</a></li>
       <li><a href="investment-plans.html">Investment Plans</a></li>
       <li><a href="testimonials.html">Testimonials</a></li>
@@ -700,7 +726,7 @@
   <section class="page-header">
     <div class="container">
       <div class="breadcrumb">
-        <a href="index.html">Home</a>
+        <a href="{% url 'trade:hero' %}">Home</a>
         <span>/</span>
         <a href="learn-more.html">Learn More</a>
       </div>
@@ -868,41 +894,26 @@
       <div class="footer-col">
         <h3>Prestige Wealth</h3>
         <p>Building financial legacies through strategic cryptocurrency investments and wealth preservation.</p>
-        <div class="social-icons">
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-linkedin-in"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
-        </div>
+       
       </div>
       
       <div class="footer-col">
         <h3>Quick Links</h3>
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="learn-more.html">Learn More</a></li>
-          <li><a href="investment-plans.html">Investment Plans</a></li>
-          <li><a href="testimonials.html">Testimonials</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="{% url 'trade:hero' %} #home">Home</a></li>
+          <li><a href="{% url 'trade:hero' %}#plans">Investment Plans</a></li>
+          <li><a href="{% url 'trade:hero' %}#testimonials">Testimonials</a></li>
+          <!-- <li><a href="contact.html">Contact</a></li> -->
         </ul>
       </div>
       
-      <div class="footer-col">
-        <h3>Legal</h3>
-        <ul>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Disclaimer</a></li>
-          <li><a href="#">Compliance</a></li>
-        </ul>
-      </div>
+
       
-      <div class="footer-col">
+      <div id="contactUs" class="footer-col">
         <h3>Contact Us</h3>
         <ul>
-          <li><i class="fas fa-envelope"></i> info@prestigewealth.com</li>
-          <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-          <li><i class="fas fa-map-marker-alt"></i> 750 Park Avenue, New York, NY</li>
+          <li><i class="fas fa-envelope"></i> wealthcoprestige@gmail.com</li>
+          
         </ul>
       </div>
     </div>

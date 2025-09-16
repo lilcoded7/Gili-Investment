@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
+from accounts.models import ReferralCode
 import re
 
 User = get_user_model()
@@ -9,25 +10,18 @@ class LoginForm(forms.Form):
     email = forms.EmailField(
         required=True,
         widget=forms.TextInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "enter your email"
-            }
+            attrs={"class": "form-control", "placeholder": "enter your email"}
         ),
     )
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={
-            "class": "form-control", 
-            "type": "password"
-            }
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control", "type": "password"}),
     )
+
     def clean(self):
         validated_data = super().clean()
-        email = validated_data.get('email')
-        password = validated_data.get('password')
+        email = validated_data.get("email")
+        password = validated_data.get("password")
 
         if email and password:
             user = authenticate(email=email, password=password)
@@ -41,64 +35,49 @@ class RegisterForm(forms.Form):
     username = forms.CharField(
         required=True,
         widget=forms.TextInput(
-            attrs={
-            "class": "form-control",
-            "placeholder": "enter your username"
-            }
+            attrs={"class": "form-control", "placeholder": "enter your username"}
         ),
     )
     full_name = forms.CharField(
         required=True,
         widget=forms.TextInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "enter your full name"
-            }
+            attrs={"class": "form-control", "placeholder": "enter your full name"}
         ),
     )
     email = forms.EmailField(
         required=True,
-        widget=forms.TextInput(
-            attrs={
-            "class": "form-control", "placeholder": 
-            "enter your email"
-            }
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "placeholder": "enter your email"}
         ),
     )
     country_code = forms.CharField(
         required=True,
         widget=forms.TextInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "enter country code"
-            }
+            attrs={"class": "form-control", "placeholder": "enter country code"}
         ),
     )
     phone_number = forms.CharField(
         required=True,
         widget=forms.TextInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "000 000 000"
-            }
+            attrs={"class": "form-control", "placeholder": "000 000 000"}
         ),
     )
     password = forms.CharField(
         required=True,
         widget=forms.PasswordInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "enter your password"
-            }
+            attrs={"class": "form-control", "placeholder": "enter your password"}
         ),
     )
     confirm_password = forms.CharField(
         required=True,
         widget=forms.PasswordInput(
-            attrs={
-            "class": "form-control", 
-            "placeholder": "confirm your password"
-            }
+            attrs={"class": "form-control", "placeholder": "confirm your password"}
+        ),
+    )
+    referral_code = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "enter referral code"}
         ),
     )
 
@@ -106,6 +85,14 @@ class RegisterForm(forms.Form):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
+        referral_code = cleaned_data.get("referral_code")
+
+        if referral_code:
+            code_qs = ReferralCode.objects.filter(code=referral_code)
+            if not code_qs.exists():
+                raise forms.ValidationError("Enter a valid referral code")
+            if code_qs.filter(is_expired=True).exists():
+                raise forms.ValidationError("Referral Code Expired")
 
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "Passwords do not match")
@@ -114,12 +101,14 @@ class RegisterForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("email already exist")
+        if email and User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email already exists")
         return email
 
     def clean_password(self):
         password = self.cleaned_data.get("password")
+        if not password:
+            return password
 
         if len(password) < 8:
             raise forms.ValidationError("Password must be at least 8 characters long.")
@@ -139,7 +128,6 @@ class RegisterForm(forms.Form):
             )
 
         return password
-
 
 class ActivateAccounForm(forms.Form):
     code = forms.CharField(

@@ -3,9 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Register for Prestige Wealth - Premium cryptocurrency investment platform">
-  <title>Register | Prestige Wealth</title>
+  <meta name="description" content="Register for Prestige Wealth - Premium cryptocurrency investment platform offering institutional-grade security and exceptional returns.">
+  <meta name="keywords" content="Prestige Wealth, cryptocurrency investment, bitcoin, ethereum, crypto trading, wealth management">
+  <meta name="author" content="Prestige Wealth">
+  
+  <!-- Canonical URL for SEO -->
+  <link rel="canonical" href="https://www.prestigewealthco.com/register" />
+  
+  <!-- Open Graph Tags for Social Sharing -->
+  <meta property="og:title" content="Register | Prestige Wealth">
+  <meta property="og:description" content="Join Prestige Wealth - Premium cryptocurrency investment platform with institutional-grade security.">
+  <meta property="og:url" content="https://www.prestigewealthco.com/register">
+  <meta property="og:type" content="website">
+  
+  <title>Register | Prestige Wealth - Premium Cryptocurrency Investment Platform</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Country code selector CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+  
   <style>
     /* Global Styles */
     :root {
@@ -185,17 +202,21 @@
       font-size: 14px;
     }
     
-    .phone-input-group {
-      display: flex;
-      gap: 10px;
+    .phone-input-container {
+      position: relative;
     }
     
-    .phone-input-group .form-group:first-child {
-      flex: 0 0 100px;
+    #phone {
+      padding-left: 80px;
     }
     
-    .phone-input-group .form-group:last-child {
-      flex: 1;
+    .selected-dial-code {
+      position: absolute;
+      top: 40px;
+      left: 15px;
+      color: var(--text-dark);
+      font-weight: 500;
+      z-index: 1;
     }
     
     .password-input-group {
@@ -276,6 +297,15 @@
       color: var(--primary-dark);
     }
     
+    /* Country code dropdown styling */
+    .iti {
+      width: 100%;
+    }
+    
+    .iti__selected-flag {
+      padding: 0 10px 0 15px;
+    }
+    
     /* Responsive Styles */
     @media (max-width: 992px) {
       .registration-container {
@@ -315,15 +345,6 @@
         padding: 20px;
       }
       
-      .phone-input-group {
-        flex-direction: column;
-        gap: 0;
-      }
-      
-      .phone-input-group .form-group:first-child {
-        flex: 1;
-      }
-      
       .section-title {
         font-size: 1.8rem;
       }
@@ -344,6 +365,10 @@
       .benefit-content h3 {
         font-size: 1.1rem;
       }
+      
+      #phone {
+        padding-left: 70px;
+      }
     }
   </style>
 </head>
@@ -351,7 +376,7 @@
   <!-- Header & Navigation -->
   <header>
     <div class="container header-container">
-      <a href="{% url 'trade:hero' %}" class="logo">
+      <a href="https://www.prestigewealthco.com/" class="logo">
         <i class="fas fa-crown"></i>
         Prestige Wealth
       </a>
@@ -363,7 +388,7 @@
     <div class="container registration-container">
       <div class="registration-content">
         <h2 class="section-title">Join Prestige Wealth</h2>
-        <p>Create your account to access exclusive cryptocurrency investment opportunities with institutional-grade security and exceptional returns.</p>
+        <p>Create your account to access exclusive cryptocurrency investment opportunities with institutional-grade security and exceptional returns at <a href="https://www.prestigewealthco.com/" style="color: var(--primary-gold); text-decoration: none;">PrestigeWealthCo.com</a>.</p>
         
         <ul class="benefits-list">
           <li>
@@ -452,30 +477,22 @@
             {% endif %}
           </div>
           
-          <div class="phone-input-group">
-            <div class="form-group">
-              <label for="id_country_code" class="form-label">Country Code</label>
-              {{ form.country_code }}
-              {% if form.country_code.errors %}
-                <ul class="errorlist">
-                  {% for error in form.country_code.errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
+          <!-- Hidden fields for country code and phone number -->
+          <input type="hidden" id="id_country_code" name="country_code">
+          <input type="hidden" id="id_phone_number" name="phone_number">
+          
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <div class="phone-input-container">
+              <input type="tel" id="phone" class="form-control" name="phone" autocomplete="off">
             </div>
-            
-            <div class="form-group">
-              <label for="id_phone_number" class="form-label">Phone Number</label>
-              {{ form.phone_number }}
-              {% if form.phone_number.errors %}
-                <ul class="errorlist">
-                  {% for error in form.phone_number.errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </div>
+            {% if form.phone_number.errors %}
+              <ul class="errorlist">
+                {% for error in form.phone_number.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           </div>
           
           <div class="form-group">
@@ -511,6 +528,18 @@
               </ul>
             {% endif %}
           </div>
+
+          <div class="form-group">
+            <label for="id_referral_code" class="form-label">Enter Referral Code</label>
+            {{ form.referral_code }}
+            {% if form.referral_code.errors %}
+              <ul class="errorlist">
+                {% for error in form.referral_code.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
         </form>
@@ -527,12 +556,46 @@
         
         <div class="form-footer">
           <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign In</a></p>
+          <p>Visit our homepage: <a href="https://www.prestigewealthco.com/">www.prestigewealthco.com</a></p>
         </div>
       </div>
     </div>
   </section>
 
   <script>
+    // Initialize country code selector
+    const phoneInput = document.querySelector("#phone");
+    const countryCodeInput = document.querySelector("#id_country_code");
+    const phoneNumberInput = document.querySelector("#id_phone_number");
+    
+    const iti = window.intlTelInput(phoneInput, {
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+      separateDialCode: true,
+      preferredCountries: ["us", "gb", "ca", "au"],
+      initialCountry: "auto",
+      geoIpLookup: function(callback) {
+        fetch("https://ipapi.co/json")
+          .then(function(res) { return res.json(); })
+          .then(function(data) { callback(data.country_code); })
+          .catch(function() { callback("us"); });
+      }
+    });
+    
+    // Update hidden inputs with selected country code and phone number
+    function updatePhoneData() {
+      const selectedCountryData = iti.getSelectedCountryData();
+      const fullNumber = iti.getNumber();
+      
+      // Extract just the national number (without country code)
+      const nationalNumber = fullNumber.replace(`+${selectedCountryData.dialCode}`, '').trim();
+      
+      countryCodeInput.value = '+' + selectedCountryData.dialCode;
+      phoneNumberInput.value = nationalNumber;
+    }
+    
+    phoneInput.addEventListener("input", updatePhoneData);
+    phoneInput.addEventListener("countrychange", updatePhoneData);
+    
     // Add styling to form fields
     document.addEventListener('DOMContentLoaded', function() {
       const inputs = document.querySelectorAll('.form-control');
@@ -553,10 +616,9 @@
       document.getElementById('id_username').placeholder = 'Enter your username';
       document.getElementById('id_full_name').placeholder = 'Enter your full name';
       document.getElementById('id_email').placeholder = 'Enter your email';
-      document.getElementById('id_country_code').placeholder = 'Country code';
-      document.getElementById('id_phone_number').placeholder = '000 000 000';
       document.getElementById('id_password').placeholder = 'Enter your password';
       document.getElementById('id_confirm_password').placeholder = 'Confirm your password';
+      document.getElementById('id_referral_code').placeholder = 'Enter referral code';
       
       // Set password field types
       document.getElementById('id_password').type = 'password';
@@ -568,18 +630,39 @@
       const passwordField = document.getElementById('id_password');
       const confirmPasswordField = document.getElementById('id_confirm_password');
       
-      togglePassword.addEventListener('click', function() {
-        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordField.setAttribute('type', type);
-        this.querySelector('i').classList.toggle('fa-eye');
-        this.querySelector('i').classList.toggle('fa-eye-slash');
-      });
+      if (togglePassword && passwordField) {
+        togglePassword.addEventListener('click', function() {
+          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordField.setAttribute('type', type);
+          this.querySelector('i').classList.toggle('fa-eye');
+          this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+      }
       
-      toggleConfirmPassword.addEventListener('click', function() {
-        const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
-        confirmPasswordField.setAttribute('type', type);
-        this.querySelector('i').classList.toggle('fa-eye');
-        this.querySelector('i').classList.toggle('fa-eye-slash');
+      if (toggleConfirmPassword && confirmPasswordField) {
+        toggleConfirmPassword.addEventListener('click', function() {
+          const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          confirmPasswordField.setAttribute('type', type);
+          this.querySelector('i').classList.toggle('fa-eye');
+          this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+      }
+      
+      // Initialize phone data
+      updatePhoneData();
+      
+      // Form submission validation
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        // Make sure phone data is updated before submission
+        updatePhoneData();
+        
+        // Validate phone number
+        if (phoneInput.value.trim() && !iti.isValidNumber()) {
+          e.preventDefault();
+          alert('Please enter a valid phone number.');
+          phoneInput.focus();
+        }
       });
     });
   </script>

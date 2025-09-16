@@ -138,7 +138,8 @@ def withdraw_fund(request):
 
 @login_required
 def list_trade(request):
-    trades = Trade.objects.all()
+    customer = Customer.objects.filter(user=request.user).first()
+    trades = Trade.objects.filter(customer=customer)
 
     context = {"trades": trades}
     return render(request, "dash/trade.html", context)

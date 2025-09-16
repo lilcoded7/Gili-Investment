@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic Setup -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Prestige Wealth - Premium cryptocurrency investment platform offering exclusive wealth management solutions">
-  <title>Prestige Wealth | Premium Crypto Investments</title>
+  
+  <!-- SEO Meta Tags -->
+  <title>Prestige Wealth | Cryptocurrency Investment Platform</title>
+  <meta name="description" content="Prestige Wealth is a premium cryptocurrency investment platform offering institutional-grade security, transparency, and exceptional returns for investors worldwide.">
+  <meta name="keywords" content="Prestige Wealth, Prestige Wealth Co, crypto investments, cryptocurrency platform, secure crypto trading, institutional crypto, wealth management crypto">
+  <meta name="author" content="Prestige Wealth Co.">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://www.prestigewealthco.com/">
+
+  <!-- Open Graph (For Social Sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.prestigewealthco.com/">
+  <meta property="og:title" content="Prestige Wealth | Cryptocurrency Investment Platform">
+  <meta property="og:description" content="Prestige Wealth is a trusted crypto investment platform with institutional-grade security and consistent returns.">
+  <meta property="og:image" content="https://www.prestigewealthco.com/static/images/preview.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.prestigewealthco.com/">
+  <meta name="twitter:title" content="Prestige Wealth | Cryptocurrency Investment Platform">
+  <meta name="twitter:description" content="Join Prestige Wealth and enjoy premium crypto investment services with institutional-grade security.">
+  <meta name="twitter:image" content="https://www.prestigewealthco.com/static/images/preview.jpg">
+
+  <!-- Fonts & Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  
   <style>
     /* Global Styles */
     :root {
@@ -831,25 +857,25 @@
   <!-- Hero Section -->
   <section class="hero" id="home">
     <!-- Slide 1 -->
-    <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1621761191315-27f0c87eb3cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1072&q=80');"></div>
+    <div class="hero-slide active" style="background-image: url('https://img.etimg.com/thumb/width-1200,height-900,imgsize-530622,resizemode-75,msid-107359159/markets/cryptocurrency/crypto-news/10-best-cryptocurrencies-to-invest-in-august-2024.jpg');"></div>
     
     <!-- Slide 2 -->
-    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1620336655055-bd87ca8f1370?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://imageio.forbes.com/specials-images/imageserve/1199763300/bitcoin--bitcoin-price--monero--monero-price--cryptocurrency--image/960x0.jpg?height=518&width=711&fit=bounds');"></div>
     
     <!-- Slide 3 -->
-    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1622630998477-20aa2a5c9c1a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://www.shutterstock.com/image-illustration/cryptocurrency-crash-concept-fall-crisis-600nw-1979816858.jpg');"></div>
     
     <!-- Slide 4 -->
-    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1626618012641-bfbca5a31239?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://tradersunion.com/uploads/images/tu-news/7176/preview-with-watermark.jpg');"></div>
     
     <!-- Slide 5 -->
-    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://static.news.bitcoin.com/wp-content/uploads/2025/02/bitcoin-bull-market.jpg');"></div>
     
     <div class="container hero-content">
       <h1>Elevate Your Wealth With Premium Crypto Investments</h1>
       <p>Prestige Wealth offers exclusive cryptocurrency investment opportunities with institutional-grade security and exceptional returns.</p>
       <div class="hero-buttons">
-        <button class="btn btn-primary">Explore Investments</button>
+        <a href="#plans" class="btn btn-primary">Explore Investments</a>
        <a href="{% url 'trade:about' %}"> <button class="btn btn-outline">Learn More</button></a>
       </div>
     </div>
@@ -913,7 +939,7 @@
       
       <div class="payouts-stats">
         <div class="stat-item">
-          <div class="stat-number">5,000+</div>
+          <div class="stat-number">1,000+</div>
           <div class="stat-label">Happy Investors</div>
         </div>
         <div class="stat-item">
@@ -930,66 +956,124 @@
   
   <!-- Investment Plans -->
   <section class="investment-plans" id="plans">
-    <div class="container">
-      <h2 class="section-title">Exclusive Investment Plans</h2>
-      <div class="plans-container">
-        <div class="plan-card">
-          <div class="plan-header">
-            <h3>Silver Tier</h3>
-            <div class="plan-price">$5,000<span>/minimum</span></div>
-            <p>Entry-level premium plan</p>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="fas fa-check"></i> Up to 15% annual returns</li>
-              <li><i class="fas fa-check"></i> Basic portfolio diversification</li>
-              <li><i class="fas fa-check"></i> Quarterly performance reports</li>
-              <li><i class="fas fa-check"></i> Email support</li>
-              <li><i class="fas fa-check"></i> Mobile app access</li>
-            </ul>
-            <button class="btn btn-primary" style="width: 100%;">Get Started</button>
-          </div>
+  <div class="container">
+    <h2 class="section-title">Exclusive Investment Plans</h2>
+    <div class="plans-container">
+
+      <!-- Starter Tier -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Starter Tier</h3>
+          <div class="plan-price">$1,000<span>/minimum</span></div>
+          <p>Begin your investment journey</p>
         </div>
-        
-        <div class="plan-card">
-          <div class="recommended">Recommended</div>
-          <div class="plan-header">
-            <h3>Gold Tier</h3>
-            <div class="plan-price">$25,000<span>/minimum</span></div>
-            <p>Our most popular plan</p>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="fas fa-check"></i> Up to 25% annual returns</li>
-              <li><i class="fas fa-check"></i> Advanced portfolio diversification</li>
-              <li><i class="fas fa-check"></i> Monthly performance reports</li>
-              <li><i class="fas fa-check"></i> Priority support</li>
-              <li><i class="fas fa-check"></i> Exclusive webinars</li>
-            </ul>
-            <button class="btn btn-primary" style="width: 100%;">Get Started</button>
-          </div>
-        </div>
-        
-        <div class="plan-card">
-          <div class="plan-header">
-            <h3>Platinum Tier</h3>
-            <div class="plan-price">$100,000<span>/minimum</span></div>
-            <p>VIP exclusive plan</p>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="fas fa-check"></i> Up to 40% annual returns</li>
-              <li><i class="fas fa-check"></i> Personalized investment strategy</li>
-              <li><i class="fas fa-check"></i> Weekly performance reports</li>
-              <li><i class="fas fa-check"></i> 24/7 dedicated manager</li>
-              <li><i class="fas fa-check"></i> Exclusive events access</li>
-            </ul>
-            <button class="btn btn-primary" style="width: 100%;">Get Started</button>
-          </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 8% annual returns</li>
+            <li><i class="fas fa-check"></i> Basic diversification</li>
+            <li><i class="fas fa-check"></i> Annual performance report</li>
+            <li><i class="fas fa-check"></i> Email support</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
         </div>
       </div>
+
+      <!-- Bronze Tier -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Bronze Tier</h3>
+          <div class="plan-price">$2,500<span>/minimum</span></div>
+          <p>Step up with more benefits</p>
+        </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 12% annual returns</li>
+            <li><i class="fas fa-check"></i> Improved diversification</li>
+            <li><i class="fas fa-check"></i> Semi-annual reports</li>
+            <li><i class="fas fa-check"></i> Email & chat support</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Silver Tier -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Silver Tier</h3>
+          <div class="plan-price">$5,000<span>/minimum</span></div>
+          <p>Entry-level premium plan</p>
+        </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 15% annual returns</li>
+            <li><i class="fas fa-check"></i> Portfolio diversification</li>
+            <li><i class="fas fa-check"></i> Quarterly performance reports</li>
+            <li><i class="fas fa-check"></i> Mobile app access</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Gold Tier -->
+      <div class="plan-card">
+        <div class="recommended">Recommended</div>
+        <div class="plan-header">
+          <h3>Gold Tier</h3>
+          <div class="plan-price">$25,000<span>/minimum</span></div>
+          <p>Our most popular plan</p>
+        </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 25% annual returns</li>
+            <li><i class="fas fa-check"></i> Advanced portfolio strategy</li>
+            <li><i class="fas fa-check"></i> Monthly reports</li>
+            <li><i class="fas fa-check"></i> Priority support</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Diamond Tier -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Diamond Tier</h3>
+          <div class="plan-price">$50,000<span>/minimum</span></div>
+          <p>Premium investor plan</p>
+        </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 30% annual returns</li>
+            <li><i class="fas fa-check"></i> Tailored investment strategy</li>
+            <li><i class="fas fa-check"></i> Bi-weekly reports</li>
+            <li><i class="fas fa-check"></i> Dedicated support team</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Platinum Elite -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Platinum Elite</h3>
+          <div class="plan-price">$1,000,000<span>/minimum</span></div>
+          <p>Exclusive VIP investment club</p>
+        </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Up to 50% annual returns</li>
+            <li><i class="fas fa-check"></i> Fully personalized portfolio</li>
+            <li><i class="fas fa-check"></i> Weekly executive reports</li>
+            <li><i class="fas fa-check"></i> 24/7 dedicated wealth manager</li>
+            <li><i class="fas fa-check"></i> Invitation-only global events</li>
+          </ul>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+      </div>
+
     </div>
-  </section>
+  </div>
+</section>
+
   
   <!-- Testimonials -->
   <section class="testimonials" id="testimonials">
@@ -1103,12 +1187,7 @@
       <div class="footer-col">
         <h3>Prestige Wealth</h3>
         <p>Building financial legacies through strategic cryptocurrency investments and wealth preservation. Over $15 million paid out to our investors.</p>
-        <div class="social-icons">
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-linkedin-in"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
-        </div>
+        
       </div>
       
       <div class="footer-col">
@@ -1123,28 +1202,17 @@
         </ul>
       </div>
       
-      <div class="footer-col">
-        <h3>Legal</h3>
-        <ul>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Disclaimer</a></li>
-          <li><a href="#">Compliance</a></li>
-        </ul>
-      </div>
       
       <div class="footer-col">
         <h3>Contact Us</h3>
         <ul>
-          <li><i class="fas fa-envelope"></i> info@prestigewealth.com</li>
-          <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-          <li><i class="fas fa-map-marker-alt"></i> 750 Park Avenue, New York, NY</li>
+          <li><i class="fas fa-envelope"></i> wealthcoprestige@gmail.com</li>
         </ul>
       </div>
     </div>
     
     <div class="container copyright">
-      <p>&copy; 2023 Prestige Wealth. All rights reserved.</p>
+      <p>&copy; 2025 Prestige Wealth. All rights reserved.</p>
     </div>
   </footer>
   

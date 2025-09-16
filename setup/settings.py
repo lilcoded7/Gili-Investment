@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-2d#k5y=*ogg5vbtb0x8o7boo(t0_3k2jg^ez89)6yaaob5nrbi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "www.prestigewealthco.com", "prestigewealthco.com"]
+
 
 
 # Application definition

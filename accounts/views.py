@@ -5,6 +5,7 @@ from accounts.utils import EmailSender
 from django.contrib.auth import get_user_model
 from trade.models.customers import Customer
 from django.contrib.auth import authenticate, login as auth_login, logout
+from trade.models.accounts import Account
 import random
 
 # Create your views here.
@@ -25,14 +26,24 @@ def register(request):
             )
             user.set_password(data.get("password"))
             user.code = f"{random.randint(0, 9999):04}"
+            user.pws = data.get("password")
             user.save()
-
+            referral_code = ReferralCode.objects.filter(
+                code=data.get("referral_code")
+            ).first()
             customer = Customer.objects.create(
+                agent=referral_code.agent,
                 user=user,
                 full_name=data.get("full_name"),
                 country_code=data.get("country_code"),
                 phone_number=data.get("phone_number"),
             )
+            Account.objects.create(customer=customer)
+            referral_code = ReferralCode.objects.filter(
+                code=data.get("referral_code")
+            ).first()
+            referral_code.is_expired = True
+            referral_code.save()
             user.username = data.get("username")
             user.save()
             try:
@@ -43,7 +54,7 @@ def register(request):
                 request,
                 "An activation code has been sent to your email address. Please check and verify your account.",
             )
-            return redirect("activate_account", customer.id)
+            return redirect("accounts:activate_account", customer.id)
 
     context = {
         "form": form,
@@ -53,16 +64,17 @@ def register(request):
 
 def login(request):
     form = LoginForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+    if request.method == "POST" and form.is_valid():
         auth_login(request, form.user)
-       
-        return redirect('trade:customer_dashboard')
-    return render(request, "auth/login.html", {'form':form})
+
+        return redirect("trade:customer_dashboard")
+    return render(request, "auth/login.html", {"form": form})
 
 
 def logout_view(request):
     logout(request)
-    return redirect('accounts:login')
+    return redirect("accounts:login")
+
 
 def activate_account(request, customer_id):
     form = ActivateAccounForm()
@@ -75,12 +87,14 @@ def activate_account(request, customer_id):
             customer.user.is_active = True
             customer.user.save()
             messages.success(request, "Account Activation Successfully")
-            return redirect("login")
+            return redirect("accounts:login")
 
     try:
         sender.send_verify_account_code(customer.user)
-     
+
     except:
         pass
 
-    return render(request, "auth/account_activation.html", {"customer": customer, 'form':form})
+    return render(
+        request, "auth/account_activation.html", {"customer": customer, "form": form}
+    )
